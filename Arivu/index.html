@@ -336,7 +336,7 @@
                     radial-gradient(ellipse at bottom right, rgba(200,57,43,0.04) 0%, transparent 50%);
             }
         }
-        ::selection { background: rgba(200,57,43,0.2); color: var(--paper); }
+        ::selection { background: rgba(200,57,43,0.2); color: var(--ink); }
         a { color: inherit; text-decoration: none; }
         :focus-visible {
             outline: none;
@@ -1389,7 +1389,7 @@
             position: sticky; top: 110px;
             max-height: calc(100vh - 140px);
             overflow-y: auto; padding-right: 1rem;
-            scrollbar-width: thin; padding: 1.25rem;
+            scrollbar-width: thin; padding: 1.25rem 1rem 1.25rem 1.25rem;
             background: var(--paper);
             background-image: var(--ruled-lines), var(--texture-paper);
             backdrop-filter: blur(8px);
@@ -2515,7 +2515,7 @@
             border-top: none;
             position: relative;
             clip-path: polygon(0 10px, 4% 0, 9% 8px, 17% 1px, 27% 10px, 37% 2px, 50% 9px, 63% 1px, 76% 10px, 86% 2px, 94% 9px, 100% 0, 100% 100%, 0 100%);
-            overflow: visible;
+            overflow: hidden;
         }
         footer::before {
             content: ''; position: absolute; inset: 0;
@@ -2874,7 +2874,17 @@
             .problem-sec, .heritage-sec, .join-sec { background: #fff !important; color: #000 !important; }
             .h2 { color: #000 !important; }
             .h2 em { color: #c8392b !important; }
-            *::before, *::after { display: none !important; }
+            .pcard::before, .pcard::after, .hero-right::before, .hero-right::after,
+            .featured-card::before, .featured-card::after, .matcher-form::before, .matcher-form::after,
+            .contact-form-wrap::before, .join-form::before, .join-form::after,
+            .hero-stat-card::before, .doodle, .coffee-stain, .ink-stamp,
+            .margin-note::before, .washi-tape, .corner-doodle, .doodle-bg, .doodle-arrow,
+            .new-sticker, .paperclip, .arrow-note, .label-with-circle::after,
+            .filter-bar::before, .featured-grid::before, .hand-divider::before, .hand-divider::after,
+            .loading-screen::before, .loading-screen::after,
+            .member::before, .member-av::after,
+            .hero-scroll-indicator, .hero-particles, .hero-noise,
+            .mr-path::before, .mr-email-cta::before { display: none !important; }
             .comparison-table { font-size: 10pt; }
             .comparison-table th { background: #333 !important; color: #fff !important; }
         }
@@ -2894,7 +2904,7 @@
             .hiw-steps { grid-template-columns: repeat(2, 1fr); }
             .hiw-steps::before { display: none; }
             .wrap { padding: 0 1.75rem; }
-            nav { padding: 0.9rem 1.75rem; }
+            nav { padding: 0.9rem 1.75rem; clip-path: none; border-bottom: 1px solid var(--border); }
             section { padding: 5.5rem 0; }
             .hero { padding: 8rem 1.75rem 5rem; }
             .nav-links {
@@ -3029,9 +3039,7 @@
             transform: rotate(-15deg);
         }
         /* Paper clip on cards */
-        .pcard::before {
-            /* override existing tape - keep both */
-        }
+
         .pcard .paperclip {
             position: absolute; top: -18px; right: 14px;
             width: 22px; height: 38px;
@@ -3246,14 +3254,7 @@
         }
         .filter-bar { position: relative; }
         /* Loading spinner upgrade */
-        .mr-spinner {
-            border: 3px dashed var(--accent) !important;
-            border-radius: 50%;
-            animation: spin 1.2s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+
         /* Hand-drawn corner accents */
         .corner-doodle {
             position: absolute; top: 12px; right: 12px;
@@ -3466,7 +3467,7 @@
                             but because the information gap is real and wide.
                         </p>
                         <div class="prob-quote">
-                            "You can't aim for something you've never heard of. The problem isn't IIT or NEET.. it's that most students here never get to see the full map."
+                            "You can't aim for something you've never heard of. The problem isn't IIT or NEET. It's that most students here never get to see the full map."
                         </div>
                         <p class="body-text">
                             Arivu is a bilingual science career literacy project. A website, a WhatsApp newsletter,
@@ -5477,13 +5478,12 @@
 
                 // Initial count
                 updateCounter();
-                // Set total count immediately on load
+                // Set total count immediately on load Ak
                 var totalAll = grid.querySelectorAll('.pcard').length;
                 if (totalCountEl) totalCountEl.textContent = totalAll;
             })();
 
                         initCareerMatcher();
-
             function calculateMatches(params) {
                 var interests = params.interests;
                 var skills = params.skills;
@@ -5552,17 +5552,17 @@
                     var matchedTags = [];
                     var matchedSkills = [];
                     var matchedGoal = false;
-                    // Interests - high weight (3 points each, with synergy bonus)
-                    interests.forEach(function(i) {
-                        if (career.tags.indexOf(i) !== -1) {
+                    // Interests - high weight (3 points each, with synergy bonus) Ak
+                    interests.forEach(function(j) {
+                        if (career.tags.indexOf(j) !== -1) {
                             score += 3;
-                            matchedTags.push(i);
+                            matchedTags.push(j);
                         }
                     });
-                    // Multiple interest matches = synergy bonus
+                    // Multiple interest matches = synergy bonus Ak
                     if (matchedTags.length >= 3) score += 2;
                     if (matchedTags.length >= 2) score += 1;
-                    // Skills (2 points each)
+                    // Skills (2 points each) AaD
                     skills.forEach(function(s) {
                         if (career.tags.indexOf(s) !== -1) {
                             score += 2;
@@ -5592,7 +5592,13 @@
                         if (parents.indexOf('neet') !== -1 && career.parents.indexOf('neet') === -1 && career.parents.indexOf('medicine') === -1 && parents.indexOf('any') === -1) score -= 1;
                     }
                     // Normalize by tag count to avoid bias toward high-tag careers
-                    var maxPossible = interests.length * 3 + skills.length * 2 + 5 + 2;
+                    // Account for: base points + synergy bonus (up to 3) + goal bonus (up to 5+3) + parent bonus (up to ~6)
+                    var interestBase = interests.length * 3;
+                    var skillBase = skills.length * 2;
+                    var goalBase = goal ? 8 : 0; // 5 direct + up to 3 compatibility
+                    var parentBase = parents.length > 0 ? 6 : 0; // 1 for 'any' + 2.5 per match + 1 for multi
+                    var synergyBase = interests.length >= 3 ? 3 : (interests.length >= 2 ? 1 : 0);
+                    var maxPossible = interestBase + skillBase + goalBase + parentBase + synergyBase;
                     var normalizedScore = maxPossible > 0 ? (score / maxPossible) * 100 : 0;
                     var newCareer = {};
                     for (var key in career) { newCareer[key] = career[key]; }
@@ -5603,11 +5609,9 @@
                     newCareer.matchedGoal = matchedGoal;
                     return newCareer;
                 });
-                // Filter zero-score, then sort, then take top 4 (was 3)
-                var top = scored.filter(function(c) { return c.score > 0; })
-                    .sort(function(a, b) { return b.score - a.score; })
-                    .slice(0, 4);
-                if (top.every(function(t) { return t.score === 0; })) {
+                // Check if any career scored above zero before filtering
+                var hasMatch = scored.some(function(c) { return c.score > 0; });
+                if (!hasMatch) {
                     return [
                         careers.find(function(c) { return c.id === 'comp_bio'; }),
                         careers.find(function(c) { return c.id === 'sci_journalism'; }),
@@ -5616,10 +5620,14 @@
                         var nc = {};
                         for (var key in c) { nc[key] = c[key]; }
                         nc.score = 1;
+                        nc.matchPercent = 0;
                         return nc;
                     });
                 }
-                return top.filter(function(t) { return t.score > 0; });
+                // Filter zero-score, then sort, then take top 4
+                return scored.filter(function(c) { return c.score > 0; })
+                    .sort(function(a, b) { return b.score - a.score; })
+                    .slice(0, 4);
             }
 
             function renderResults(matches, container) {
@@ -5713,7 +5721,7 @@
                 }, 8000);
             }
 
-            /* KaTeX Formula */
+            /* KaTeX Formula AAD*/
             function renderFormula() {
                 var el = document.getElementById('katex-formula');
                 if (typeof katex !== 'undefined' && el) {
@@ -5727,12 +5735,12 @@
             if (typeof katex !== 'undefined') { renderFormula(); }
             else { window.addEventListener('load', renderFormula); }
 
-            /* Hero stat cards animation */
+            /* Hero stat cards animation  AK */
             setTimeout(function() {
                 document.querySelectorAll('.hero-stat-card').forEach(function(el) { el.classList.add('vis'); });
             }, 400);
 
-            /* Back to top buttons */
+            /* Back to top buttons  AAD*/
             var btt = document.getElementById('btt');
             if (btt) {
                 btt.addEventListener('click', function(e) {
@@ -5750,28 +5758,25 @@
                 });
             }
 
-            /* Card keyboard navigation */
-            document.querySelectorAll('.pcard').forEach(function(card) {
-                card.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        card.classList.toggle('expanded');
-                    }
-                });
-            });
+
             document.querySelectorAll('.contact-method').forEach(function(method) {
                 method.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        var email = method.querySelector('.cm-value');
-                        if (email && email.textContent.indexOf('@') !== -1) {
-                            window.location.href = 'mailto:' + email.textContent.trim();
+                        var link = method.querySelector('a[href]');
+                        if (link) {
+                            window.location.href = link.getAttribute('href');
+                        } else {
+                            var value = method.querySelector('.cm-value');
+                            if (value && value.textContent.indexOf('@') !== -1) {
+                                window.location.href = 'mailto:' + value.textContent.trim();
+                            }
                         }
                     }
                 });
             });
 
-            /* Dynamic footer year */
+            /* Dynamic footer year  AK */
             var yearEls = document.querySelectorAll('.footer-bottom span');
             if (yearEls.length > 0) {
                 yearEls[0].textContent = 'Community Initiative · Palakkad, Kerala · Zero-cost platform · © ' + new Date().getFullYear();
@@ -5779,6 +5784,8 @@
         });
 
         // htmls
+        //made it good?
+        //yes ok 
         
     </script>
 </body>
