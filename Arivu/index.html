@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="en">
 
 <head>
     <link rel="icon" type="image/png" href="favicon.png">
@@ -10,6 +10,10 @@
         content="A bilingual science career literacy project for +2 school students in Palakkad, Kerala. Explore 50+ science pathways beyond IIT-JEE and NEET.">
     <meta name="theme-color" content="#0f0e0c" id="meta-theme-color">
     <meta name="color-scheme" content="light dark" id="meta-color-scheme">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Arivu">
     <link rel="canonical" href="https://arivu-palakkad.github.io/">
     <!-- Early theme bootstrap: prevents FOUC by applying saved/system theme before first paint -->
     <script>
@@ -26,6 +30,14 @@
                 } else {
                     document.documentElement.style.colorScheme = 'light';
                 }
+            } catch (e) { }
+        })();
+    </script>
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('arivu-lang');
+                document.documentElement.setAttribute('data-lang', saved === 'ml' ? 'ml' : 'en');
             } catch (e) { }
         })();
     </script>
@@ -70,7 +82,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Sans+Malayalam:wght@300;400;500;700&family=IBM+Plex+Mono:wght@300;400;500&family=Caveat:wght@400;500;600;700&family=Kalam:wght@300;400;700&family=Patrick+Hand&family=Gloria+Hallelujah&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Sans+Malayalam:wght@300;400;500;700&family=IBM+Plex+Mono:wght@300;400;500&family=Caveat:wght@400;500;600;700&family=Kalam:wght@300;400;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
@@ -99,8 +111,9 @@
             --mal: 'Noto Sans Malayalam', sans-serif;
             --hand: 'Caveat', cursive;
             --hand-2: 'Kalam', cursive;
-            --hand-3: 'Patrick Hand', cursive;
-            --marker: 'Gloria Hallelujah', cursive;
+            --hand-3: 'Instrument Sans', sans-serif;
+            --marker: 'Caveat', cursive;
+            --footer-year: "2025";
             --highlighter-yellow: rgba(255, 230, 110, 0.55);
             --highlighter-pink: rgba(255, 175, 195, 0.5);
             --highlighter-blue: rgba(170, 205, 245, 0.5);
@@ -144,6 +157,10 @@
             --metallic-gold: linear-gradient(145deg, #e8b73a 0%, #f0c860 30%, #b88a20 60%, #e8b73a 100%);
             --metallic-red: linear-gradient(145deg, #b02820 0%, #d04030 30%, #8a1810 60%, #c8342a 100%);
             --leather-brown: linear-gradient(145deg, #2a3548 0%, #1b2433 50%, #2a3548 100%);
+        }
+
+        html[data-lang="ml"] body {
+            font-family: var(--mal);
         }
 
         /* ---- loading screen ---- */
@@ -309,6 +326,8 @@
             background: rgba(201, 153, 58, 0.25);
             border-radius: 50%;
             animation: particleFloat linear infinite;
+            will-change: transform, opacity;
+            contain: layout style;
         }
 
         .hero-particle:nth-child(odd) {
@@ -718,10 +737,11 @@
             text-transform: none;
             color: var(--ink-2);
             font-family: var(--hand-3);
-            transition: color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+            transition: color 200ms ease, background 200ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
             padding: 0.4rem 0.5rem;
             border-radius: 0;
             position: relative;
+            will-change: transform;
         }
 
         .nav-links a::after {
@@ -733,8 +753,8 @@
             height: 6px;
             background-image: var(--squiggle-underline);
             background-repeat: no-repeat;
-            background-position: 0 100%;
-            background-size: 100% 6px;
+            background-position: -150px 100%;
+            background-size: 150px 6px;
             opacity: 0;
             transition: opacity var(--transition-normal);
         }
@@ -743,12 +763,18 @@
         .nav-links a:focus-visible {
             color: var(--accent);
             background: rgba(232, 183, 58, 0.12);
-            transform: translateY(-1px);
+            transform: scale(1.05) translateY(-1px);
+        }
+
+        .nav-links a.nav-active {
+            background: rgba(232, 183, 58, 0.12);
+            color: var(--accent);
         }
 
         .nav-links a:hover::after,
         .nav-links a:focus-visible::after {
             opacity: 0.7;
+            animation: drawSquiggle 400ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
         .nav-cta {
@@ -796,8 +822,8 @@
         .nav-cta:hover,
         .nav-cta:focus-visible {
             background: transparent;
-            transform: rotate(-0.4deg) translateY(-2px);
-            box-shadow: none;
+            transform: rotate(1deg) translateY(-2px) scale(1.05);
+            box-shadow: var(--shadow-md);
             color: var(--ink);
         }
 
@@ -1752,6 +1778,66 @@
             background: none;
         }
 
+        @media (prefers-reduced-motion: no-preference) {
+            .hero-kicker::before {
+                animation: pencilWiggle 2.8s ease-in-out infinite;
+                transform-origin: 50% 80%;
+            }
+
+            .hero-h1 span.motion-reveal.vis,
+            .h2.motion-reveal.vis {
+                transition-delay: 120ms;
+            }
+
+            .hero-right::after {
+                --float-rotate: 6deg;
+                animation: paperFloat 5.5s ease-in-out infinite;
+            }
+
+            .hero-stat-card.vis,
+            .pcard.vis,
+            .featured-card.vis,
+            .scholar.vis,
+            .impact-card.vis,
+            .member.vis,
+            .resource-card.vis {
+                animation: paperSettle 620ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+            }
+
+            .hero-stat-card.vis:nth-child(odd),
+            .pcard.vis:nth-child(odd),
+            .featured-card.vis:nth-child(odd) {
+                --settle-rotate: -0.6deg;
+            }
+
+            .hero-stat-card.vis:nth-child(even),
+            .pcard.vis:nth-child(even),
+            .featured-card.vis:nth-child(even) {
+                --settle-rotate: 0.8deg;
+            }
+
+            .pcard.vis:nth-child(3n) {
+                --settle-rotate: -0.3deg;
+            }
+
+            .pcard.vis::before,
+            .hero-stat-card.vis::before {
+                animation: tapeFlutter 4s ease-in-out infinite;
+                transform-origin: 50% 50%;
+            }
+
+            .pcard:hover .pc-cat,
+            .pcard:focus-within .pc-cat,
+            .f-btn:hover,
+            .f-btn:focus-visible,
+            .btn-primary:hover,
+            .btn-primary:focus-visible,
+            .btn-ghost:hover,
+            .btn-ghost:focus-visible {
+                transition-duration: 180ms;
+            }
+        }
+
         .pc-cat {
             font-family: var(--hand);
             font-size: 1.1rem;
@@ -2149,7 +2235,7 @@
             font-family: var(--serif);
             font-weight: 700;
         }
-            
+
         .featured-link {
             display: inline-flex;
             align-items: center;
@@ -2377,13 +2463,15 @@
             font-weight: 600;
             border: 2px solid var(--border-2);
             background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
-            color: var(--ink-3);
+            color: var(--ink-2);
             transition: all var(--transition-bounce);
             user-select: none;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -1px 0 rgba(0, 0, 0, 0.08);
             position: relative;
             overflow: hidden;
             text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+            animation: quizChipIn 460ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+            cursor: pointer;
         }
 
         .mf-chip::after {
@@ -2418,6 +2506,15 @@
             color: var(--paper);
             border-color: var(--ink);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+            animation: quizChipSelect 340ms cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        html.dark .mf-chip.selected {
+            background: linear-gradient(180deg, var(--accent) 0%, #c8342a 100%);
+            color: #fff8f0;
+            border-color: var(--accent-2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 14px rgba(240, 90, 74, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .mf-chip.selected::after {
@@ -2495,8 +2592,8 @@
         .mf-submit:hover,
         .mf-submit:focus-visible {
             background: transparent;
-            transform: rotate(-0.4deg) translateY(-2px);
-            box-shadow: none;
+            transform: rotate(0.6deg) translateY(-2px) scale(1.03);
+            box-shadow: var(--shadow-md);
             border-color: var(--ink);
             outline: none;
         }
@@ -2541,7 +2638,7 @@
 
         .mf-reset:hover,
         .mf-reset:focus-visible {
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.03) rotate(-0.5deg);
             border-color: var(--accent);
             color: var(--accent);
             background: var(--highlighter-yellow);
@@ -2555,6 +2652,13 @@
             border: 1.5px solid var(--border-2);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-inner);
+            transition: transform var(--transition-bounce), box-shadow var(--transition-normal), border-color var(--transition-normal);
+        }
+
+        .matcher-live-panel.is-ready {
+            transform: translateY(-2px);
+            border-color: color-mix(in srgb, var(--sage) 60%, var(--border-2));
+            box-shadow: var(--shadow-md);
         }
 
         .matcher-live-top {
@@ -2586,6 +2690,17 @@
             border-radius: inherit;
             background: linear-gradient(90deg, var(--accent), var(--gold), var(--sage));
             transition: width var(--transition-slow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .matcher-meter span::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+            transform: translateX(-110%);
+            animation: quizMeterSweep 1.5s ease-in-out infinite;
         }
 
         .matcher-result {
@@ -2722,11 +2837,32 @@
             }
         }
 
-        .mr-path:hover,
-        .mr-path:focus {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        .mr-path.match-1:hover,
+        .mr-path.match-1:focus {
+            transform: translateY(-2.5px);
             border-left-color: var(--accent-2);
+            box-shadow: 0 8px 20px rgba(200, 52, 42, 0.14), var(--shadow-md);
+        }
+
+        .mr-path.match-2:hover,
+        .mr-path.match-2:focus {
+            transform: translateY(-2.5px);
+            border-left-color: var(--gold);
+            box-shadow: 0 8px 20px rgba(232, 183, 58, 0.14), var(--shadow-md);
+        }
+
+        .mr-path.match-3:hover,
+        .mr-path.match-3:focus {
+            transform: translateY(-2.5px);
+            border-left-color: var(--sage);
+            box-shadow: 0 8px 20px rgba(74, 124, 89, 0.14), var(--shadow-md);
+        }
+
+        .mr-path.match-4:hover,
+        .mr-path.match-4:focus {
+            transform: translateY(-2.5px);
+            border-left-color: var(--ink-3);
+            box-shadow: 0 8px 20px rgba(27, 36, 51, 0.1), var(--shadow-md);
         }
 
         .mr-path::before {
@@ -3004,14 +3140,14 @@
         }
 
         .scholar {
-            background: linear-gradient(160deg, #2e2820 0%, #1a1510 40%, #2e2820 100%);
+            background: linear-gradient(170deg, var(--paper) 0%, var(--paper-2) 60%, var(--paper-3) 100%);
             padding: 2rem;
             opacity: 0;
             transform: translateY(16px);
             transition: all var(--transition-slow);
             border-radius: var(--radius-lg);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-2);
+            box-shadow: var(--shadow-sm);
             position: relative;
             overflow: hidden;
         }
@@ -3034,9 +3170,9 @@
 
         .scholar:hover,
         .scholar:focus-within {
-            background: linear-gradient(145deg, var(--ink-2) 0%, var(--ink) 100%);
+            background: linear-gradient(170deg, var(--paper-2) 0%, var(--paper-3) 60%, var(--paper-4) 100%);
             transform: translateY(-4px);
-            box-shadow: var(--shadow-lg), 0 8px 24px rgba(201, 153, 58, 0.25);
+            box-shadow: var(--shadow-lg), 0 8px 24px rgba(201, 153, 58, 0.15);
             outline: none;
             z-index: 2;
         }
@@ -3059,17 +3195,17 @@
             font-family: var(--serif);
             font-size: 1.05rem;
             font-weight: 600;
-            color: var(--paper);
+            color: var(--ink);
             margin-bottom: 0.3rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .sc-place {
             font-size: 0.75rem;
-            color: rgba(245, 240, 232, 0.7);
+            color: var(--ink-3);
             margin-bottom: 0.85rem;
             padding: 0.25rem 0.65rem;
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--paper-3);
             border-radius: var(--radius-sm);
             display: inline-block;
         }
@@ -3077,7 +3213,7 @@
         .sc-desc {
             font-size: 0.8rem;
             line-height: 1.7;
-            color: rgba(245, 240, 232, 0.85);
+            color: var(--ink-2);
         }
 
         .sc-badge {
@@ -3088,10 +3224,9 @@
             letter-spacing: 0.08em;
             padding: 0.3rem 0.9rem;
             border-radius: var(--radius-pill);
-            border: 2px solid rgba(201, 153, 58, 0.5);
-            color: var(--gold);
-            background: linear-gradient(180deg, rgba(201, 153, 58, 0.2) 0%, rgba(201, 153, 58, 0.08) 100%);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+            border: 1.5px solid var(--accent-2);
+            color: var(--accent);
+            background: rgba(200, 52, 42, 0.05);
             font-weight: 600;
             transition: transform var(--transition-fast);
         }
@@ -3944,8 +4079,8 @@
         .cf-submit:hover,
         .cf-submit:focus-visible {
             background: transparent;
-            transform: rotate(-0.4deg) translateY(-2px);
-            box-shadow: none;
+            transform: rotate(0.6deg) translateY(-2px) scale(1.03);
+            box-shadow: var(--shadow-md);
             border-color: var(--ink);
             outline: none;
         }
@@ -4187,6 +4322,16 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
             margin-top: 3rem;
+        }
+
+        .suggest-wrap {
+            max-width: 560px;
+            margin: 3rem auto 0;
+            padding: 2rem 2.25rem;
+            background: var(--paper);
+            border: 1.5px dashed var(--ink-3);
+            border-radius: 4px;
+            box-shadow: var(--shadow-paper);
         }
 
         .resource-card {
@@ -4501,8 +4646,8 @@
         .join-submit:hover,
         .join-submit:focus-visible {
             background: transparent;
-            transform: rotate(-0.4deg) translateY(-2px);
-            box-shadow: none;
+            transform: rotate(0.6deg) translateY(-2px) scale(1.03);
+            box-shadow: var(--shadow-md);
             border-color: var(--ink);
             outline: none;
         }
@@ -4577,7 +4722,7 @@
         }
 
         footer::after {
-            content: 'Arivu\00B7\00A02025';
+            content: 'Arivu\00B7' var(--footer-year);
             position: absolute;
             bottom: 1.2rem;
             left: 2rem;
@@ -4752,7 +4897,7 @@
         }
 
         .footer-bottom::after {
-            content: '\2014 made with care, Palakkad \'25';
+            content: '\2014 made with care, Palakkad \'26';
             font-family: var(--hand);
             color: rgba(245, 236, 214, 0.7);
             font-size: 1.15rem;
@@ -4869,8 +5014,90 @@
             }
         }
 
+        @keyframes paperSettle {
+            0% {
+                opacity: 0;
+                transform: translateY(22px) rotate(-1.8deg) scale(0.98);
+            }
+
+            65% {
+                opacity: 1;
+                transform: translateY(-4px) rotate(0.5deg) scale(1.01);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotate(var(--settle-rotate, 0deg)) scale(1);
+            }
+        }
+
+        @keyframes paperFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(var(--float-rotate, 0deg));
+            }
+
+            50% {
+                transform: translateY(-7px) rotate(calc(var(--float-rotate, 0deg) * -1));
+            }
+        }
+
+        @keyframes tapeFlutter {
+
+            0%,
+            100% {
+                transform: translateX(-50%) rotate(-3deg);
+            }
+
+            50% {
+                transform: translateX(-50%) rotate(2deg) translateY(-1px);
+            }
+        }
+
+        @keyframes pencilWiggle {
+
+            0%,
+            100% {
+                transform: rotate(10deg) translateY(0);
+            }
+
+            45% {
+                transform: rotate(-7deg) translateY(-2px);
+            }
+        }
+
         .anim {
             animation: fadeUp 0.7s ease both;
+        }
+
+        .motion-reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition:
+                opacity 650ms cubic-bezier(0.2, 0.8, 0.2, 1),
+                transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .motion-reveal.vis {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .label.motion-reveal {
+            transform: translateY(14px) rotate(-1deg);
+        }
+
+        .label.motion-reveal.vis {
+            transform: translateY(0) rotate(-1deg);
+        }
+
+        .h2.motion-reveal {
+            background-size: 0 8px;
+        }
+
+        .h2.motion-reveal.vis {
+            background-size: 100% 8px;
         }
 
         .anim-1 {
@@ -5083,6 +5310,13 @@
         .epc-name {
             color: var(--ink);
             font-weight: 500;
+        }
+
+        .epc-countdown {
+            font-family: var(--mono);
+            font-size: 0.66rem;
+            margin-left: 0.5rem;
+            font-weight: 600;
         }
 
         .epc-cat {
@@ -5772,7 +6006,10 @@
             font-size: 2rem;
             opacity: 0.6;
             z-index: 1;
-            transform: rotate(-15deg);
+            animation: arrow-bounce 3.5s ease-in-out infinite;
+            transform-origin: center;
+            will-change: transform;
+            contain: layout style;
         }
 
         /* Paper clip on cards */
@@ -5917,21 +6154,32 @@
             opacity: 0.55;
             z-index: 1;
             font-family: var(--hand);
+            contain: layout style;
         }
 
         .doodle-flower {
             font-size: 1.6rem;
             color: var(--gold);
+            /* single combined keyframe avoids two competing transform sources */
+            animation: flower-orbit 12s ease-in-out infinite;
+            transform-origin: center;
+            will-change: transform;
         }
 
         .doodle-lightbulb {
             font-size: 1.4rem;
             color: var(--gold);
+            animation: sway-bulb 6s ease-in-out infinite;
+            transform-origin: top center;
+            will-change: transform, opacity;
         }
 
         .doodle-star {
             font-size: 1.4rem;
             color: var(--accent);
+            animation: star-twinkle 4s ease-in-out infinite;
+            transform-origin: center;
+            will-change: transform, opacity;
         }
 
         /* Hidden extra pathways - shown when "View All" clicked */
@@ -6181,22 +6429,207 @@
             display: flex;
             gap: 0.4rem;
             justify-content: center;
-            margin: 0.8rem 0;
+            margin: 0 0 1rem;
+            padding: 0.85rem;
+            background: linear-gradient(180deg, rgba(232, 183, 58, 0.12), rgba(200, 57, 43, 0.05));
+            border: 1px dashed var(--border-2);
+            border-radius: var(--radius-lg);
         }
 
         .quiz-dot {
-            width: 8px;
+            width: 44px;
             height: 8px;
-            border-radius: 50%;
+            border-radius: var(--radius-pill);
             background: var(--paper-3);
             border: 1.5px solid var(--border-2);
-            transition: all 0.2s;
+            transition: all var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
         }
 
         .quiz-dot.active {
             background: var(--accent);
             border-color: var(--accent);
-            transform: scale(1.3);
+            transform: translateY(-1px) scaleY(1.25);
+            box-shadow: 0 0 0 4px rgba(200, 57, 43, 0.12);
+        }
+
+        .quiz-dot.complete {
+            background: linear-gradient(90deg, var(--accent), var(--gold));
+            border-color: var(--gold);
+        }
+
+        .quiz-dot.complete::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            transform: translateX(100%);
+            animation: quizMeterSweep 1.8s ease-in-out infinite;
+        }
+
+        .matcher-tip-strip {
+            margin: -0.25rem 0 1.25rem;
+            padding: 0.7rem 0.9rem;
+            border-left: 3px solid var(--gold);
+            background: rgba(232, 183, 58, 0.12);
+            color: var(--ink-3);
+            font-family: var(--hand-2);
+            font-size: 0.94rem;
+            line-height: 1.45;
+            border-radius: var(--radius-sm);
+            transition: transform var(--transition-bounce), background var(--transition-fast), color var(--transition-fast);
+        }
+
+        .matcher-tip-strip.bump {
+            transform: translateY(-2px) rotate(-0.2deg);
+            background: rgba(232, 183, 58, 0.2);
+        }
+
+        @keyframes quizChipIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(0.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes quizChipSelect {
+            0% {
+                transform: scale(1);
+            }
+            30% {
+                transform: scale(0.82, 1.2);
+            }
+            50% {
+                transform: scale(1.18, 0.82);
+            }
+            70% {
+                transform: scale(0.92, 1.08);
+            }
+            85% {
+                transform: scale(1.05, 0.95);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .chip-particle {
+            position: absolute;
+            pointer-events: none;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            z-index: 10000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+            animation: chipParticleBlast 650ms cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+        }
+
+        @keyframes chipParticleBlast {
+            0% {
+                transform: translate(0, 0) scale(1.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--dx), var(--dy)) scale(0.2);
+                opacity: 0;
+            }
+        }
+
+        @keyframes quizMeterSweep {
+            to {
+                transform: translateX(110%);
+            }
+        }
+
+        @keyframes drawSquiggle {
+            from {
+                background-position: -150px 100%;
+            }
+
+            to {
+                background-position: 0 100%;
+            }
+        }
+
+        /* Single unified transform for the flower — no competing animations */
+        @keyframes flower-orbit {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            25% {
+                transform: translateY(-5px) rotate(90deg);
+            }
+
+            50% {
+                transform: translateY(-8px) rotate(180deg);
+            }
+
+            75% {
+                transform: translateY(-3px) rotate(270deg);
+            }
+
+            100% {
+                transform: translateY(0px) rotate(360deg);
+            }
+        }
+
+        @keyframes star-twinkle {
+            0% {
+                transform: scale(1) rotate(-5deg);
+                opacity: 0.55;
+            }
+
+            50% {
+                transform: scale(1.18) rotate(8deg);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: scale(1) rotate(-5deg);
+                opacity: 0.55;
+            }
+        }
+
+        @keyframes sway-bulb {
+            0% {
+                transform: rotate(-5deg);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: rotate(5deg);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: rotate(-5deg);
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes arrow-bounce {
+            0% {
+                transform: translate(0, 0) rotate(-15deg);
+            }
+
+            40% {
+                transform: translate(5px, -6px) rotate(-10deg);
+            }
+
+            70% {
+                transform: translate(3px, -3px) rotate(-13deg);
+            }
+
+            100% {
+                transform: translate(0, 0) rotate(-15deg);
+            }
         }
 
         /* Sticky tape decorations in margins */
@@ -6213,6 +6646,7 @@
             border-right: 1px dashed rgba(0, 0, 0, 0.1);
             opacity: 0.85;
             z-index: 2;
+            contain: layout style;
         }
 
         .washi-tape.wt-yellow {
@@ -6295,73 +6729,73 @@
         /* Full variable override — keep everything that reads CSS vars in sync */
         :root.dark,
         html.dark {
-            --ink: #f1e9d2;
-            --ink-2: #e3d8b8;
-            --ink-3: #c2b696;
-            --ink-4: #9a8f72;
-            /* slightly brighter than before for readability */
-            --paper: #16140f;
-            /* deeper than original #1a1814 — better OLED contrast */
-            --paper-2: #1f1c16;
-            --paper-3: #28241d;
-            --paper-4: #322d24;
-            --accent: #e85042;
-            /* brighter red so it pops on dark */
-            --accent-2: #ec6a55;
-            --gold: #f0c860;
-            /* brighter gold */
-            --gold-2: #f5d580;
-            --sage: #6aa67e;
-            /* brighter sage */
-            --slate: #6b9bb8;
-            /* brighter slate */
-            --border: rgba(241, 233, 210, 0.14);
-            --border-2: rgba(241, 233, 210, 0.24);
+            /* Primary text — warm white for easy reading, no blue cast */
+            --ink: #f2ead6;
+            --ink-2: #e8dfc2;
+            --ink-3: #cdc0a0;
+            --ink-4: #a89878;
 
-            /* Highlighters tuned for dark paper — slightly more saturated */
-            --highlighter-yellow: rgba(255, 220, 90, 0.32);
-            --highlighter-pink: rgba(255, 130, 160, 0.28);
-            --highlighter-blue: rgba(120, 180, 245, 0.28);
+            /* Backgrounds — deep warm dark, NOT pure black */
+            --paper: #18160f;
+            --paper-2: #201d14;
+            --paper-3: #2a261a;
+            --paper-4: #352f22;
 
-            /* Sticky-note palette — dimmed so they don't glare, but text stays readable */
+            /* Accent colours — boosted for dark contrast */
+            --accent: #f05a4a;
+            --accent-2: #f47a64;
+            --gold: #f5cc60;
+            --gold-2: #fad980;
+            --sage: #74b488;
+            --slate: #78aac8;
+
+            --border: rgba(242, 234, 214, 0.13);
+            --border-2: rgba(242, 234, 214, 0.22);
+
+            /* Highlighters — more saturated for dark paper */
+            --highlighter-yellow: rgba(255, 224, 80, 0.35);
+            --highlighter-pink: rgba(255, 130, 160, 0.3);
+            --highlighter-blue: rgba(120, 190, 255, 0.28);
+
+            /* Sticky-note palette — warm, dimmed */
             --sticky-yellow: #4d4018;
             --sticky-pink: #4d2528;
             --sticky-blue: #1f3a55;
             --sticky-green: #2a4225;
 
-            --margin-red: #c8403f;
+            --margin-red: #d44545;
             --pencil-gray: #9a9080;
 
-            --focus-ring: 0 0 0 3px rgba(232, 80, 66, 0.55), 0 0 0 6px rgba(232, 80, 66, 0.2);
-            --focus-ring-high-contrast: 0 0 0 3px #fff, 0 0 0 6px rgba(232, 80, 66, 0.6);
+            --focus-ring: 0 0 0 3px rgba(240, 90, 74, 0.6), 0 0 0 6px rgba(240, 90, 74, 0.2);
+            --focus-ring-high-contrast: 0 0 0 3px #fff, 0 0 0 6px rgba(240, 90, 74, 0.6);
 
             /* Deeper, more pronounced shadows for dark */
-            --shadow-sm: 0 1px 1px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.45);
-            --shadow-md: 0 1px 1px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 1px 1px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.5), 0 12px 24px rgba(0, 0, 0, 0.5), 0 24px 48px rgba(0, 0, 0, 0.35);
-            --shadow-xl: 0 2px 2px rgba(0, 0, 0, 0.4), 0 6px 12px rgba(0, 0, 0, 0.5), 0 16px 32px rgba(0, 0, 0, 0.55), 0 32px 64px rgba(0, 0, 0, 0.4);
-            --shadow-interactive: 0 8px 24px rgba(232, 80, 66, 0.35), 0 4px 12px rgba(232, 80, 66, 0.2);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.45), 0 6px 12px rgba(0, 0, 0, 0.5), 0 12px 20px rgba(0, 0, 0, 0.35);
+            --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.45), 0 8px 16px rgba(0, 0, 0, 0.55), 0 20px 36px rgba(0, 0, 0, 0.4), 0 36px 56px rgba(0, 0, 0, 0.3);
+            --shadow-xl: 0 4px 8px rgba(0, 0, 0, 0.45), 0 12px 24px rgba(0, 0, 0, 0.55), 0 24px 48px rgba(0, 0, 0, 0.5), 0 48px 80px rgba(0, 0, 0, 0.35);
+            --shadow-interactive: 0 6px 20px rgba(240, 90, 74, 0.4), 0 3px 10px rgba(240, 90, 74, 0.25);
             --shadow-pressed: 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 2px 6px rgba(0, 0, 0, 0.5);
-            --shadow-inner: inset 0 3px 6px rgba(0, 0, 0, 0.45), inset 0 1px 3px rgba(0, 0, 0, 0.3);
-            --shadow-raised: 0 2px 1px rgba(255, 233, 180, 0.06) inset, 0 -2px 4px rgba(0, 0, 0, 0.4);
-            --shadow-inset-well: inset 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 233, 180, 0.06);
-            --shadow-bevel-out: 0 1px 0 rgba(255, 233, 180, 0.08) inset, 0 -1px 0 rgba(0, 0, 0, 0.4) inset, 0 2px 4px rgba(0, 0, 0, 0.3);
-            --shadow-bevel-in: 0 -1px 0 rgba(255, 233, 180, 0.06) inset, 0 1px 0 rgba(0, 0, 0, 0.5) inset, 0 2px 8px rgba(0, 0, 0, 0.3);
-            --shadow-paper: 0 1px 1px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.5), 0 12px 24px rgba(0, 0, 0, 0.45);
-            --shadow-paper-hover: 0 2px 2px rgba(0, 0, 0, 0.45), 0 8px 16px rgba(0, 0, 0, 0.55), 0 20px 40px rgba(0, 0, 0, 0.5);
+            --shadow-inner: inset 0 3px 8px rgba(0, 0, 0, 0.5), inset 0 1px 4px rgba(0, 0, 0, 0.35);
+            --shadow-raised: 0 2px 1px rgba(255, 240, 190, 0.07) inset, 0 -2px 4px rgba(0, 0, 0, 0.5);
+            --shadow-inset-well: inset 0 4px 10px rgba(0, 0, 0, 0.55), inset 0 2px 4px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 240, 190, 0.06);
+            --shadow-bevel-out: 0 1px 0 rgba(255, 240, 190, 0.09) inset, 0 -1px 0 rgba(0, 0, 0, 0.45) inset, 0 2px 6px rgba(0, 0, 0, 0.35);
+            --shadow-bevel-in: 0 -1px 0 rgba(255, 240, 190, 0.07) inset, 0 1px 0 rgba(0, 0, 0, 0.55) inset, 0 2px 10px rgba(0, 0, 0, 0.35);
+            --shadow-paper: 0 2px 4px rgba(0, 0, 0, 0.45), 0 6px 12px rgba(0, 0, 0, 0.5), 0 16px 30px rgba(0, 0, 0, 0.4);
+            --shadow-paper-hover: 0 4px 8px rgba(0, 0, 0, 0.5), 0 12px 24px rgba(0, 0, 0, 0.6), 0 28px 48px rgba(0, 0, 0, 0.45);
 
             /* Metallic gradients re-tuned for dark */
-            --metallic-dark: linear-gradient(145deg, #0f0e0c 0%, #1f1c16 40%, #0f0e0c 100%);
-            --metallic-gold: linear-gradient(145deg, #f0c860 0%, #f5d580 30%, #8a6510 60%, #f0c860 100%);
-            --metallic-red: linear-gradient(145deg, #b02820 0%, #e85042 30%, #6a1208 60%, #c8342a 100%);
-            --leather-brown: linear-gradient(145deg, #1f1c16 0%, #0f0e0c 50%, #1f1c16 100%);
+            --metallic-dark: linear-gradient(145deg, #100f0c 0%, #201d14 40%, #100f0c 100%);
+            --metallic-gold: linear-gradient(145deg, #f5cc60 0%, #fad980 30%, #8a6510 60%, #f5cc60 100%);
+            --metallic-red: linear-gradient(145deg, #b02820 0%, #f05a4a 30%, #6a1208 60%, #d04030 100%);
+            --leather-brown: linear-gradient(145deg, #201d14 0%, #100f0c 50%, #201d14 100%);
 
-            /* Light-on-dark ruled lines + smudge */
-            --ruled-lines: repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(241, 233, 210, 0.04) 31px, rgba(241, 233, 210, 0.04) 32px);
-            --ink-smudge: radial-gradient(ellipse 240px 200px at 80% 20%, rgba(241, 233, 210, 0.06) 0%, transparent 60%);
+            /* Ruled lines + smudge — subtle on dark */
+            --ruled-lines: repeating-linear-gradient(0deg, transparent 0, transparent 31px, rgba(242, 234, 214, 0.05) 31px, rgba(242, 234, 214, 0.05) 32px);
+            --ink-smudge: radial-gradient(ellipse 240px 200px at 80% 20%, rgba(242, 234, 214, 0.07) 0%, transparent 60%);
 
-            /* Squiggle underline with light stroke (replaces dark-blue stroke) */
-            --squiggle-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='8' viewBox='0 0 200 8' preserveAspectRatio='none'%3E%3Cpath d='M0,4 Q5,0 10,4 T20,4 T30,4 T40,4 T50,4 T60,4 T70,4 T80,4 T90,4 T100,4 T110,4 T120,4 T130,4 T140,4 T150,4 T160,4 T170,4 T180,4 T190,4 T200,4' stroke='%23c2b696' stroke-width='1.4' fill='none' stroke-linecap='round' opacity='0.65'/%3E%3C/svg%3E");
+            /* Squiggle underline — lighter stroke for dark bg */
+            --squiggle-underline: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='8' viewBox='0 0 200 8' preserveAspectRatio='none'%3E%3Cpath d='M0,4 Q5,0 10,4 T20,4 T30,4 T40,4 T50,4 T60,4 T70,4 T80,4 T90,4 T100,4 T110,4 T120,4 T130,4 T140,4 T150,4 T160,4 T170,4 T180,4 T190,4 T200,4' stroke='%23cdb88a' stroke-width='1.6' fill='none' stroke-linecap='round' opacity='0.75'/%3E%3C/svg%3E");
 
             color-scheme: dark;
         }
@@ -6383,20 +6817,23 @@
         }
 
         html.dark .hero::before {
-            background: linear-gradient(180deg, rgba(22, 20, 15, 0.7) 0%, rgba(22, 20, 15, 0.88) 40%, var(--paper) 100%);
+            background: linear-gradient(180deg,
+                    rgba(24, 22, 15, 0.7) 0%,
+                    rgba(24, 22, 15, 0.9) 45%,
+                    var(--paper) 100%);
         }
 
-        /* Particle colors pop on dark */
+        /* Particle colors pop on dark — warmer gold & rose */
         html.dark .hero-particle {
-            background: rgba(240, 200, 96, 0.45);
+            background: rgba(245, 204, 96, 0.5);
         }
 
         html.dark .hero-particle:nth-child(odd) {
-            background: rgba(232, 80, 66, 0.35);
+            background: rgba(240, 90, 74, 0.38);
         }
 
         html.dark .hero-particle:nth-child(3n) {
-            background: rgba(106, 166, 126, 0.35);
+            background: rgba(116, 180, 136, 0.38);
         }
 
         /* Logos */
@@ -6408,10 +6845,10 @@
         /* Nav bar: translucent + blurred for a modern look */
         html.dark nav,
         html.dark #main-nav {
-            background: rgba(22, 20, 15, 0.82);
-            backdrop-filter: blur(10px) saturate(140%);
-            -webkit-backdrop-filter: blur(10px) saturate(140%);
-            border-bottom-color: rgba(241, 233, 210, 0.12);
+            background: rgba(24, 22, 15, 0.85);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            border-bottom-color: rgba(242, 234, 214, 0.10);
         }
 
         html.dark .nav-links a {
@@ -6421,15 +6858,23 @@
         html.dark .nav-links a:hover,
         html.dark .nav-links a:focus-visible {
             color: var(--ink);
+            background: rgba(245, 204, 96, 0.14);
         }
 
         html.dark .nav-cta {
-            color: #fff5ea;
+            color: #fff8f0;
+            border-color: rgba(242, 234, 214, 0.5);
+        }
+
+        html.dark .nav-cta:hover {
+            border-color: var(--ink);
+            box-shadow: 0 4px 18px rgba(240, 90, 74, 0.2);
         }
 
         /* Mobile dropdown menu uses dark paper */
         html.dark .nav-links {
             background: linear-gradient(145deg, var(--paper) 0%, var(--paper-2) 100%);
+            border-color: var(--border-2);
         }
 
         /* Text selection */
@@ -6439,19 +6884,20 @@
             text-shadow: none;
         }
 
-        /* Scrollbar tuned for dark */
+        /* Scrollbar — polished for dark */
         html.dark ::-webkit-scrollbar-track {
-            background: var(--paper);
+            background: var(--paper-2);
         }
 
         html.dark ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #6b6253 0%, #3a3530 100%);
-            border-color: var(--paper);
-            box-shadow: inset 0 1px 2px rgba(255, 233, 180, 0.12), 0 1px 3px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(180deg, #7a6f5e 0%, #4a4438 100%);
+            border-color: var(--paper-2);
+            box-shadow: inset 0 1px 3px rgba(255, 240, 190, 0.14), 0 1px 4px rgba(0, 0, 0, 0.55);
+            border-radius: 10px;
         }
 
         html.dark ::-webkit-scrollbar-thumb:hover {
-            background: var(--ink-3);
+            background: linear-gradient(180deg, #9a8e7a 0%, #6a6054 100%);
         }
 
         /* Modal: darker backdrop + dimmer paper */
@@ -6553,6 +6999,198 @@
         }
 
         /* =========================================================
+           Dark mode — Section & text readability overrides
+           ========================================================= */
+
+        /* Section headings always use the brightest ink token */
+        html.dark h1,
+        html.dark h2,
+        html.dark h3,
+        html.dark h4 {
+            color: var(--ink);
+        }
+
+        /* Body paragraphs in content sections — slightly softer but still high contrast */
+        html.dark .hero-body p,
+        html.dark .problem-body p,
+        html.dark .faq-body p,
+        html.dark section>.section-inner>p,
+        html.dark .hero-stat-card p,
+        html.dark .matcher-desc p,
+        html.dark .matcher-desc li {
+            color: var(--ink-2);
+        }
+
+        /* All input, select, textarea — light text on dark surface */
+        html.dark input:not([type=range]),
+        html.dark textarea,
+        html.dark select {
+            background: var(--paper-3);
+            color: var(--ink);
+            border-color: var(--border-2);
+        }
+
+        html.dark input::placeholder,
+        html.dark textarea::placeholder {
+            color: var(--ink-4);
+        }
+
+        html.dark label {
+            color: var(--ink-2);
+        }
+
+        /* Matcher / Quiz section cards and labels */
+        /* Matcher / Quiz section — full dark mode restyle */
+        html.dark .matcher-sec {
+            background: linear-gradient(145deg, var(--paper-2) 0%, var(--paper-3) 100%);
+        }
+
+        html.dark .matcher-form {
+            background: var(--paper-2);
+            background-image: var(--ruled-lines), var(--texture-paper);
+            border-color: var(--border-2);
+        }
+
+        html.dark .matcher-desc {
+            background: var(--paper-2);
+            background-image: var(--ruled-lines), var(--texture-paper);
+            border-color: var(--border-2);
+            color: var(--ink-2);
+        }
+
+        /* "INTERESTS", "STRENGTHS", "PRIMARY GOAL" heading bars */
+        html.dark .mf-heading {
+            background: var(--paper-3);
+            border-color: var(--border-2);
+            color: var(--ink-2);
+        }
+
+        /* Count badge next to section heading */
+        html.dark .mf-heading span {
+            background: linear-gradient(135deg, var(--ink-2) 0%, var(--ink-3) 100%);
+            color: var(--paper);
+        }
+
+        /* Tip strip below heading */
+        html.dark .matcher-tip-strip {
+            background: rgba(245, 204, 96, 0.12);
+            border-left-color: var(--gold);
+            color: var(--ink-3);
+        }
+
+        html.dark .mf-section-label,
+        html.dark .mf-label,
+        html.dark .mf-sublabel {
+            color: var(--ink-2);
+        }
+
+        html.dark .mf-question-card {
+            background: var(--paper-2);
+            border-color: var(--border-2);
+        }
+
+        /* Chips — unselected chips in dark mode: bright text on raised dark surface */
+        html.dark .mf-chip {
+            background: linear-gradient(180deg, #2e2a1e 0%, #252016 100%);
+            color: #e8dfc2;
+            border-color: rgba(232, 223, 194, 0.22);
+            text-shadow: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 240, 180, 0.06);
+        }
+
+        html.dark .mf-chip:hover {
+            background: linear-gradient(180deg, #3a3424 0%, #2e2819 100%);
+            color: #f2ead6;
+            border-color: rgba(232, 223, 194, 0.45);
+            text-shadow: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 240, 180, 0.1);
+        }
+
+        /* Result cards in dark mode */
+        html.dark .mf-result-card,
+        html.dark .mf-result {
+            background: var(--paper-2);
+            border-color: var(--border-2);
+            color: var(--ink);
+        }
+
+        html.dark .mf-career-name {
+            color: var(--ink);
+        }
+
+        html.dark .mf-career-inst,
+        html.dark .mf-career-entry,
+        html.dark .mf-career-why {
+            color: var(--ink-3);
+        }
+
+        html.dark .mf-career-salary {
+            color: var(--gold);
+        }
+
+        /* Contact form */
+        html.dark .cf-label {
+            color: var(--ink-2);
+        }
+
+        html.dark .cf-input,
+        html.dark .cf-textarea {
+            background: var(--paper-3);
+            color: var(--ink);
+            border-color: var(--border-2);
+        }
+
+        /* Join / newsletter section */
+        html.dark .join-label,
+        html.dark .join-sublabel {
+            color: var(--ink-2);
+        }
+
+        html.dark .join-input {
+            background: var(--paper-3);
+            color: var(--ink);
+            border-color: var(--border-2);
+        }
+
+        /* Section hero stat numbers */
+        html.dark .hero-stat-number {
+            color: var(--gold);
+        }
+
+        html.dark .hero-stat-label {
+            color: var(--ink-3);
+        }
+
+        /* Pathway cards text */
+        html.dark .pc-title {
+            color: var(--ink);
+        }
+
+        html.dark .pc-inst,
+        html.dark .pc-entry,
+        html.dark .pc-salary {
+            color: var(--ink-3);
+        }
+
+        /* Problem section */
+        html.dark .problem-title,
+        html.dark .problem-heading {
+            color: var(--ink);
+        }
+
+        html.dark .problem-body,
+        html.dark .problem-sub {
+            color: var(--ink-2);
+        }
+
+        /* Footer text */
+        html.dark footer,
+        html.dark .footer-body,
+        html.dark .footer-copy {
+            color: var(--ink-3);
+        }
+
+        /* =========================================================
            Theme toggle button — visible on ALL viewport sizes
            ========================================================= */
         .nav-tools {
@@ -6561,7 +7199,8 @@
             gap: 0.6rem;
         }
 
-        .theme-toggle {
+        .theme-toggle,
+        .lang-toggle {
             min-width: 44px;
             min-height: 44px;
             background: transparent;
@@ -6574,23 +7213,27 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: border-color var(--transition-bounce),
-                background-color var(--transition-bounce),
-                color var(--transition-bounce),
-                transform var(--transition-bounce),
-                box-shadow var(--transition-bounce);
+            transition: border-color 220ms ease,
+                background-color 220ms ease,
+                color 220ms ease,
+                transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 220ms ease;
             transform: rotate(-1deg);
+            will-change: transform;
         }
 
-        .theme-toggle:hover {
-            border-color: var(--ink);
+        .theme-toggle:hover,
+        .lang-toggle:hover {
+            border-color: var(--gold);
             border-style: solid;
-            transform: rotate(0deg) translateY(-2px);
+            transform: rotate(8deg) translateY(-2px) scale(1.1);
             background: var(--highlighter-yellow);
             color: var(--ink);
+            box-shadow: 0 4px 16px rgba(245, 204, 96, 0.3);
         }
 
-        .theme-toggle:focus-visible {
+        .theme-toggle:focus-visible,
+        .lang-toggle:focus-visible {
             outline: none;
             box-shadow: var(--focus-ring);
         }
@@ -6602,7 +7245,7 @@
         }
 
         .theme-toggle:hover #theme-icon {
-            transform: rotate(360deg) scale(1.1);
+            transform: rotate(25deg) scale(1.15);
         }
 
         /* Mobile: keep toggle visible (previously hidden). It lives inside the nav dropdown. */
@@ -6698,16 +7341,17 @@
         .pcard {
             cursor: pointer;
             position: relative;
-            transition: transform var(--transition-bounce),
-                box-shadow var(--transition-bounce),
-                border-color var(--transition-fast);
+            transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 250ms ease,
+                border-color 200ms ease;
+            will-change: transform;
         }
 
         .pcard:hover,
         .pcard:focus-visible {
-            transform: translateY(-4px) rotate(-0.4deg) !important;
+            transform: translateY(-6px) rotate(-0.5deg) scale(1.01) !important;
             box-shadow: var(--shadow-paper-hover);
-            border-color: var(--ink);
+            border-color: var(--accent);
             outline: none;
         }
 
@@ -6768,6 +7412,16 @@
             color: var(--ink);
             border-color: var(--ink);
             transform: scale(1.08);
+        }
+
+        .pcard.is-faved {
+            border-color: var(--gold);
+        }
+
+        .pc-action.is-active {
+            background: var(--sticky-yellow);
+            color: var(--ink);
+            border-color: var(--gold);
         }
 
         .pc-action.is-active,
@@ -7112,7 +7766,7 @@
             background: var(--accent);
             color: var(--paper);
             border-color: var(--accent);
-            
+
         }
 
         .modal-btn.primary:hover {
@@ -7174,31 +7828,78 @@
             animation: compareRowIn 420ms ease both;
         }
 
-        .compare-table tbody tr:nth-child(2) { animation-delay: 45ms; }
-        .compare-table tbody tr:nth-child(3) { animation-delay: 90ms; }
-        .compare-table tbody tr:nth-child(4) { animation-delay: 135ms; }
-        .compare-table tbody tr:nth-child(5) { animation-delay: 180ms; }
-        .compare-table tbody tr:nth-child(6) { animation-delay: 225ms; }
-        .compare-table tbody tr:nth-child(7) { animation-delay: 270ms; }
+        .compare-table tbody tr:nth-child(2) {
+            animation-delay: 45ms;
+        }
+
+        .compare-table tbody tr:nth-child(3) {
+            animation-delay: 90ms;
+        }
+
+        .compare-table tbody tr:nth-child(4) {
+            animation-delay: 135ms;
+        }
+
+        .compare-table tbody tr:nth-child(5) {
+            animation-delay: 180ms;
+        }
+
+        .compare-table tbody tr:nth-child(6) {
+            animation-delay: 225ms;
+        }
+
+        .compare-table tbody tr:nth-child(7) {
+            animation-delay: 270ms;
+        }
 
         @keyframes compareTableArrive {
-            from { opacity: 0; transform: translateY(12px) rotate(-0.35deg); }
-            to { opacity: 1; transform: translateY(0) rotate(0); }
+            from {
+                opacity: 0;
+                transform: translateY(12px) rotate(-0.35deg);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) rotate(0);
+            }
         }
 
         @keyframes compareRowIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         @keyframes comparePulse {
-            0%, 100% { transform: scaleY(0.72); opacity: 0.42; }
-            50% { transform: scaleY(1); opacity: 0.86; }
+
+            0%,
+            100% {
+                transform: scaleY(0.72);
+                opacity: 0.42;
+            }
+
+            50% {
+                transform: scaleY(1);
+                opacity: 0.86;
+            }
         }
 
         @keyframes compareButtonGlow {
-            0%, 100% { box-shadow: 0 8px 24px rgba(200, 57, 43, 0.10); }
-            50% { box-shadow: 0 10px 30px rgba(244, 184, 77, 0.28); }
+
+            0%,
+            100% {
+                box-shadow: 0 8px 24px rgba(200, 57, 43, 0.10);
+            }
+
+            50% {
+                box-shadow: 0 10px 30px rgba(244, 184, 77, 0.28);
+            }
         }
 
         .compare-path-head {
@@ -7622,7 +8323,8 @@
                 </div>
                 <div class="pathway-counter" aria-live="polite">Showing <strong id="visible-count">22</strong> of
                     <strong id="total-count">53</strong> pathways · <span id="filter-status">all fields</span><button
-                        class="filter-reset" id="filter-reset">Reset filters ×</button></div>
+                        class="filter-reset" id="filter-reset">Reset filters ×</button>
+                </div>
                 <div class="pathways-grid" id="pathways-grid" role="list">
                     <article class="pcard" data-cat="research" role="listitem" tabindex="0">
                         <div class="pc-cat">Research · Space</div>
@@ -8709,7 +9411,175 @@
                                 class="pc-tag t-applied">Applied</span>
                         </div>
                     </article>
-
+                    <!-- ===== ADDITIONAL NEW PATHWAYS ===== -->
+                    <article class="pcard" data-cat="applied" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Applied · Electronics</div>
+                        <div class="pc-name">VLSI Design &amp; Microelectronics</div>
+                        <div class="pc-inst">IIT-M · IISc · CDAC · Qualcomm India · Intel India</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-advanced">Advanced</span>
+                            <span class="pc-badge pc-badge-exam">GATE / JEE</span>
+                        </div>
+                        <div class="pc-desc">Design the chips inside every smartphone, satellite, and medical device. India's semiconductor mission has committed ₹76,000 crore — Tata, Foxconn, and Micron are setting up fabs. CDAC's VLSI courses are the entry point.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹10–60L/yr</strong></div><span class="pc-tag t-applied">Applied</span>
+                        </div>
+                    </article>
+                    <article class="pcard" data-cat="applied" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Applied · Environment</div>
+                        <div class="pc-name">Environmental Engineering</div>
+                        <div class="pc-inst">IIT-M · NIT Calicut · CPCB · KSPCB · Enviro Labs</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-intermediate">Intermediate</span>
+                            <span class="pc-badge pc-badge-exam">GATE / JEE</span>
+                        </div>
+                        <div class="pc-desc">Design wastewater treatment plants, air quality monitoring systems, and solid waste management infrastructure. Kerala's Periyar river pollution and Brahmapuram fire created massive demand for local env. engineers.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹6–28L/yr</strong></div><span class="pc-tag t-applied">Applied</span>
+                        </div>
+                    </article>
+                    <article class="pcard" data-cat="research" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Research · Immunology</div>
+                        <div class="pc-name">Immunology &amp; Vaccine Science</div>
+                        <div class="pc-inst">ICGEB · CCMB · Serum Institute · Bharat Biotech · DBT</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-advanced">Advanced</span>
+                            <span class="pc-badge pc-badge-exam">CSIR-NET / GATE-BT</span>
+                        </div>
+                        <div class="pc-desc">Develop vaccines and immunotherapies. India is the world's largest vaccine manufacturer — Serum Institute, Bharat Biotech, and ICGEB are hiring immunologists. Post-COVID, India invested ₹900 crore in vaccine R&amp;D.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹7–38L/yr</strong></div><span class="pc-tag t-research">Research</span>
+                        </div>
+                    </article>
+                    <article class="pcard" data-cat="comms" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Communication · Film</div>
+                        <div class="pc-name">Science Documentary &amp; Filmmaking</div>
+                        <div class="pc-inst">FTII Pune · Doordarshan · NatGeo India · SRFTI</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-intermediate">Intermediate</span>
+                            <span class="pc-badge pc-badge-exam">FTII Entrance / Portfolio</span>
+                        </div>
+                        <div class="pc-desc">Produce films and documentaries that explain science to general audiences. FTII Pune is Asia's premier film school. OTT boom and YouTube have created new markets for Malayalam science content.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹5–30L/yr</strong></div><span class="pc-tag t-comms">Comms</span>
+                        </div>
+                    </article>
+                    <article class="pcard" data-cat="applied" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Applied · Computing</div>
+                        <div class="pc-name">High Performance Computing &amp; Supercomputing</div>
+                        <div class="pc-inst">CDAC · IIT-M · SERC Bangalore · PARAM Supercomputers</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-advanced">Advanced</span>
+                            <span class="pc-badge pc-badge-exam">GATE / CDAC C-CAT</span>
+                        </div>
+                        <div class="pc-desc">Build and operate the supercomputers that run climate models, drug simulations, and national security applications. CDAC's PARAM series are India's flagship supercomputers — 10 new HPC facilities planned by 2027.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹9–45L/yr</strong></div><span class="pc-tag t-applied">Applied</span>
+                        </div>
+                    </article>
+                    <article class="pcard" data-cat="policy" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Policy · Bioethics</div>
+                        <div class="pc-name">Bioethics &amp; Science Governance</div>
+                        <div class="pc-inst">TISS · IIT-M Humanities · DBT Ethics Board · ICMR</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-intermediate">Intermediate</span>
+                            <span class="pc-badge pc-badge-exam">TISS / UGC-NET / UPSC</span>
+                        </div>
+                        <div class="pc-desc">Examine the ethical dimensions of genetic engineering, AI in medicine, and research conduct. As India's biotech and AI sectors grow, the demand for bioethicists in regulatory bodies and research institutions is rising fast.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹6–30L/yr</strong></div><span class="pc-tag t-policy">Policy</span>
+                        </div>
+                    </article>
+                    <article class="pcard" data-cat="research" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Research · Microbiology</div>
+                        <div class="pc-name">Microbiology &amp; Microbiome Science</div>
+                        <div class="pc-inst">NCCS Pune · IMTECH Chandigarh · IISc · CSIR Institutes</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-advanced">Advanced</span>
+                            <span class="pc-badge pc-badge-exam">CSIR-NET / GATE-BT</span>
+                        </div>
+                        <div class="pc-desc">Study microorganisms, gut microbiome, and their role in health and disease. India's fermented foods tradition (Kerala's kanji, idli, toddy) offers unique microbial diversity for research. A fast-growing, globally funded field.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹6–30L/yr</strong></div><span class="pc-tag t-research">Research</span>
+                        </div>
+                    </article>
+                    <article class="pcard" data-cat="applied" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Applied · Transport</div>
+                        <div class="pc-name">Electric Vehicle &amp; Mobility Engineering</div>
+                        <div class="pc-inst">IIT-M · Ola Electric · Tata Motors R&amp;D · ARAI Pune</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-intermediate">Intermediate</span>
+                            <span class="pc-badge pc-badge-exam">GATE / JEE</span>
+                        </div>
+                        <div class="pc-desc">Design EV drivetrains, charging infrastructure, and battery management systems. India aims for 30% EV penetration by 2030. Kerala's bus fleet electrification under KSRTC is a direct local opportunity.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹8–40L/yr</strong></div><span class="pc-tag t-applied">Applied</span>
+                        </div>
+                    </article>
+                    <article class="pcard" data-cat="research" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Research · Biophysics</div>
+                        <div class="pc-name">Biophysics &amp; Structural Biology</div>
+                        <div class="pc-inst">IISc · NCBS · TIFR · IISER · BioSci at IITs</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-advanced">Advanced</span>
+                            <span class="pc-badge pc-badge-exam">JEST / GATE / DBT-BET</span>
+                        </div>
+                        <div class="pc-desc">Use physics tools — NMR, X-ray crystallography, cryo-EM — to understand protein structure and molecular machines. IISc's Molecular Biophysics Unit is world-class. Essential for drug design and understanding diseases at the atomic level.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹7–35L/yr</strong></div><span class="pc-tag t-research">Research</span>
+                        </div>
+                    </article>
+                    <article class="pcard" data-cat="policy" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Policy · Space</div>
+                        <div class="pc-name">Space Policy &amp; Astropolitics</div>
+                        <div class="pc-inst">ISRO · ISpA · NLSIU · Institute for Defence Studies</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-intermediate">Intermediate</span>
+                            <span class="pc-badge pc-badge-exam">UPSC / ISpA Fellowship</span>
+                        </div>
+                        <div class="pc-desc">Shape India's space diplomacy, satellite governance, and commercial space regulation. IN-SPACe (India's space regulatory body) opened the sector to private players — creating entirely new policy roles that barely existed 5 years ago.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹7–35L/yr</strong></div><span class="pc-tag t-policy">Policy</span>
+                        </div>
+                    </article>
+                    <article class="pcard" data-cat="comms" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Communication · Languages</div>
+                        <div class="pc-name">Science Translation &amp; Localization</div>
+                        <div class="pc-inst">CSIR · DST · Kerala Bhasha Institute · NCERT</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-beginner">Beginner</span>
+                            <span class="pc-badge pc-badge-exam">Language degree + Science background</span>
+                        </div>
+                        <div class="pc-desc">Translate scientific papers, textbooks, and policies into Indian languages. With only 3% of global science published in Indian languages, translators who understand both science and Malayalam or Tamil are extremely scarce and increasingly in demand.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹4–22L/yr</strong></div><span class="pc-tag t-comms">Comms</span>
+                        </div>
+                    </article>
+                    <article class="pcard" data-cat="research" data-extra="true" role="listitem" tabindex="0">
+                        <span class="new-sticker">new</span>
+                        <div class="pc-cat">Research · Toxicology</div>
+                        <div class="pc-name">Toxicology &amp; Pharmacology</div>
+                        <div class="pc-inst">CSIR-IITR Lucknow · NIMHANS · AIIMS · NATCOM</div>
+                        <div class="pc-badges">
+                            <span class="pc-badge pc-badge-diff-advanced">Advanced</span>
+                            <span class="pc-badge pc-badge-exam">CSIR-NET / GATE-BT / GPAT</span>
+                        </div>
+                        <div class="pc-desc">Study how chemicals affect living systems and develop safer drugs. Kerala's high exposure to agricultural pesticides and industrial chemicals makes local toxicologists essential. CSIR-IITR Lucknow is India's premier toxicology institute.</div>
+                        <div class="pc-footer">
+                            <div class="pc-salary">Salary: <strong>₹7–32L/yr</strong></div><span class="pc-tag t-research">Research</span>
+                        </div>
+                    </article>
 
                 </div>
             </div>
@@ -8738,7 +9608,8 @@
                                 <div class="featured-stat"><strong>₸8–45L</strong>Salary range</div>
                                 <div class="featured-stat"><strong>GATE/JEE</strong>Entry exams</div>
                             </div>
-                            <a href="#pathways" class="featured-link" data-pathway-id="data-science-ai">View full pathway &rarr;</a>
+                            <a href="#pathways" class="featured-link" data-pathway-id="data-science-ai">View full
+                                pathway &rarr;</a>
                         </div>
                     </article>
                     <article class="featured-card featured-card-2" style="transition-delay:.12s">
@@ -8757,7 +9628,8 @@
                                 <div class="featured-stat"><strong>₸6–25L</strong>Salary range</div>
                                 <div class="featured-stat"><strong>JEST/TIFR</strong>Entry exams</div>
                             </div>
-                            <a href="#pathways" class="featured-link" data-pathway-id="astrophysics-space-science">View full pathway &rarr;</a>
+                            <a href="#pathways" class="featured-link" data-pathway-id="astrophysics-space-science">View
+                                full pathway &rarr;</a>
                         </div>
                     </article>
                     <article class="featured-card featured-card-3" style="transition-delay:.24s">
@@ -8768,7 +9640,7 @@
                         <div class="featured-body">
                             <div class="featured-name">Climate Policy &amp; Sustainability</div>
                             <div class="featured-inst">TERI &middot; WRI India &middot; CPCB &middot; MoEFCC</div>
-                            <div class="featured-desc">Climate change is the defining challenge of our generation. Shape
+                        <div class="featured-desc">Climate change is the defining challenge of our generation. Shape
                                 India's response through policy research, carbon markets, and sustainable development
                                 strategy. This path combines science understanding with governance skills &mdash; rare
                                 and impactful.</div>
@@ -8776,7 +9648,8 @@
                                 <div class="featured-stat"><strong>₸7–30L</strong>Salary range</div>
                                 <div class="featured-stat"><strong>UPSC/TISS</strong>Entry exams</div>
                             </div>
-                            <a href="#pathways" class="featured-link" data-pathway-id="climate-policy-sustainability">View full pathway &rarr;</a>
+                            <a href="#pathways" class="featured-link"
+                                data-pathway-id="climate-policy-sustainability">View full pathway &rarr;</a>
                         </div>
                     </article>
                 </div>
@@ -8787,66 +9660,10 @@
             </div>
         </section>
 
-        <!-- Career Comparison Table -->
+        <!-- Career Comparison Tool — fully interactive -->
         <section class="comparison-sec" id="comparison">
             <div class="wrap">
                 <div class="label">Compare</div>
-                <h2 class="h2">Traditional vs<br><em>Alternative Paths</em></h2>
-                <p class="body-text">A clear comparison showing that traditional paths aren't the only — or even the
-                    best — route to a fulfilling science career.</p>
-                <div class="comparison-wrap">
-                    <table class="comparison-table">
-                        <thead>
-                            <tr>
-                                <th>Career Path</th>
-                                <th>Entrance Exam</th>
-                                <th>Duration</th>
-                                <th>Avg Cost</th>
-                                <th>Career Options</th>
-                                <th>Growth Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="alt-highlight">
-                                <td class="td-path">Data Science & AI</td>
-                                <td>GATE / JEE / Stats</td>
-                                <td>2–5 years</td>
-                                <td class="td-positive">₹50K–2L/yr</td>
-                                <td>Tech, Finance, Healthcare, Research</td>
-                                <td class="td-positive">38% CAGR</td>
-                            </tr>
-                            <tr>
-                                <td class="td-path">IIT-JEE Engineering</td>
-                                <td>JEE Advanced</td>
-                                <td>4 years</td>
-                                <td>₹2–12L/yr</td>
-                                <td>IT, Core, Consulting</td>
-                                <td>8–12%</td>
-                            </tr>
-                            <tr class="alt-highlight">
-                                <td class="td-path">Climate & Env. Science</td>
-                                <td>IISER IAT / JAM / UPSC</td>
-                                <td>3–5 years</td>
-                                <td class="td-positive">₹20K–80K/yr</td>
-                                <td>Research, Policy, NGOs, Govt</td>
-                                <td class="td-positive">22% CAGR</td>
-                            </tr>
-                            <tr>
-                                <td class="td-path">NEET Medical</td>
-                                <td>NEET UG</td>
-                                <td>5.5 years</td>
-                                <td>₹5–15L/yr</td>
-                                <td>Clinical, Specialization</td>
-                                <td>10–15%</td>
-                            </tr>
-                            <tr class="alt-highlight">
-                                <td class="td-path">Quantum Technology</td>
-                                <td>JEST / TIFR GS</td>
-                                <td>2–6 years</td>
-                                <td class="td-positive">₹0–50K/yr</td>
-                                <td>Computing, Crypto, Sensing</td>
-                                <td class="td-positive">45%+ CAGR</td>
-                            </tr>
                             <tr>
                                 <td class="td-path">Science Journalism</td>
                                 <td>Mass Comm / Portfolio</td>
@@ -8878,6 +9695,14 @@
                     </div>
                     <div>
                         <div class="matcher-form">
+                            <div class="quiz-progress" aria-hidden="true">
+                                <span class="quiz-dot" data-step="interests"></span>
+                                <span class="quiz-dot" data-step="skills"></span>
+                                <span class="quiz-dot" data-step="goal"></span>
+                                <span class="quiz-dot" data-step="parents"></span>
+                            </div>
+                            <div class="matcher-tip-strip" id="matcher-tip-strip">Start with what feels exciting. You
+                                can change every choice before matching.</div>
                             <div class="mf-section">
                                 <div class="mf-heading">Interests <span>Required</span></div>
                                 <div class="mf-chips" id="interests-chips">
@@ -9005,7 +9830,10 @@
                             <div class="matcher-result" id="matcher-result" hidden>
                                 <div class="mr-loading" id="mr-loading" hidden>
                                     <div class="mr-spinner"></div>
-                                    <span>Analyzing your profile...</span>
+                                    <div class="mr-loading-text-container" style="display:flex; flex-direction:column; gap:0.2rem;">
+                                        <span id="mr-loading-text" style="font-weight:600; color:var(--ink);">Analyzing your profile...</span>
+                                        <span id="mr-loading-subtext" style="font-size:0.7rem; color:var(--ink-4);">Mapping selections to STEM domains</span>
+                                    </div>
                                 </div>
                                 <div class="mr-content" id="mr-content" hidden>
                                     <div class="mr-title">Your Top Matches</div>
@@ -9808,6 +10636,13 @@
             }
 
             /* scroll-triggered fade-ins */
+            if (!prefersReducedMotion) {
+                document.querySelectorAll('.label,.h2,.body-text,.prob-quote,.fv-row,.fv-bottom,.filter-bar,.exam-cal-lead p,.exam-preview-card,.matcher-desc > p,.comparison-intro,.join-copy p,.contact-copy p,.faq-intro,.resource-intro').forEach(function (el, idx) {
+                    el.classList.add('motion-reveal');
+                    el.style.transitionDelay = Math.min(idx % 4, 3) * 70 + 'ms';
+                });
+            }
+
             var io = new IntersectionObserver(function (entries) {
                 entries.forEach(function (e) {
                     if (e.isIntersecting) {
@@ -9816,7 +10651,7 @@
                     }
                 });
             }, { threshold: 0.1 });
-            document.querySelectorAll('.pcard,.hero-stat-card,.t-item,.why-card,.narrative-card,.impact-card,.scholar,.member,.faq-item,.heritage-footer,.hiw-step,.featured-card,.resource-card').forEach(function (el) {
+            document.querySelectorAll('.pcard,.hero-stat-card,.t-item,.why-card,.narrative-card,.impact-card,.scholar,.member,.faq-item,.heritage-footer,.hiw-step,.featured-card,.resource-card,.motion-reveal').forEach(function (el) {
                 io.observe(el);
             });
 
@@ -9894,6 +10729,34 @@
                     }
                 });
             });
+            function createParticleBurst(e, chip) {
+                var rect = chip.getBoundingClientRect();
+                var x = (e && e.pageX) ? e.pageX : (rect.left + rect.width / 2 + window.scrollX);
+                var y = (e && e.pageY) ? e.pageY : (rect.top + rect.height / 2 + window.scrollY);
+                var colors = ['#c8342a', '#e8b73a', '#4a7c59', '#3a86c8'];
+                for (var i = 0; i < 8; i++) {
+                    var p = document.createElement('span');
+                    p.className = 'chip-particle';
+                    p.style.left = x + 'px';
+                    p.style.top = y + 'px';
+                    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    var angle = Math.random() * Math.PI * 2;
+                    var distance = 25 + Math.random() * 40;
+                    var dx = Math.cos(angle) * distance + 'px';
+                    var dy = Math.sin(angle) * distance + 'px';
+                    p.style.setProperty('--dx', dx);
+                    p.style.setProperty('--dy', dy);
+                    document.body.appendChild(p);
+                    (function (elem) {
+                        setTimeout(function () {
+                            if (elem && elem.parentNode) {
+                                elem.parentNode.removeChild(elem);
+                            }
+                        }, 700);
+                    })(p);
+                }
+            }
+
             function toggleChip(chip, container, maxSelect, isSkills) {
                 var isSelected = chip.classList.contains('selected');
                 if (isSelected) {
@@ -9911,20 +10774,29 @@
                     }
                     chip.classList.add('selected');
                     chip.setAttribute('aria-checked', 'true');
+                    chip.classList.remove('just-selected');
+                    void chip.offsetWidth;
+                    chip.classList.add('just-selected');
                 }
                 updateMatcherProgress();
             }
+
             function initChipSelectors() {
                 ['interests-chips', 'skills-chips', 'parents-chips'].forEach(function (groupId) {
                     var container = document.getElementById(groupId);
                     if (!container) return;
                     var isSkills = groupId === 'skills-chips';
                     var maxSelect = isSkills ? 3 : Infinity;
-                    container.querySelectorAll('.mf-chip').forEach(function (chip) {
-                        chip.addEventListener('click', function () { toggleChip(chip, container, maxSelect, isSkills); });
+                    container.querySelectorAll('.mf-chip').forEach(function (chip, idx) {
+                        chip.style.animationDelay = Math.min(idx, 10) * 22 + 'ms';
+                        chip.addEventListener('click', function (e) {
+                            createParticleBurst(e, chip);
+                            toggleChip(chip, container, maxSelect, isSkills);
+                        });
                         chip.addEventListener('keydown', function (e) {
                             if (e.key === 'Enter' || e.key === ' ') {
                                 e.preventDefault();
+                                createParticleBurst(null, chip);
                                 toggleChip(chip, container, maxSelect, isSkills);
                             }
                         });
@@ -9933,13 +10805,17 @@
                 var goalContainer = document.getElementById('goal-chips');
                 if (goalContainer) {
                     goalContainer.querySelectorAll('.mf-chip').forEach(function (chip) {
-                        chip.addEventListener('click', function () {
+                        chip.addEventListener('click', function (e) {
+                            createParticleBurst(e, chip);
                             goalContainer.querySelectorAll('.mf-chip').forEach(function (c) {
                                 c.classList.remove('selected');
                                 c.setAttribute('aria-checked', 'false');
                             });
                             chip.classList.add('selected');
                             chip.setAttribute('aria-checked', 'true');
+                            chip.classList.remove('just-selected');
+                            void chip.offsetWidth;
+                            chip.classList.add('just-selected');
                             updateMatcherProgress();
                         });
                         chip.addEventListener('keydown', function (e) {
@@ -9974,13 +10850,44 @@
                 var countEl = document.getElementById('matcher-count');
                 var readyEl = document.getElementById('matcher-readiness');
                 var fillEl = document.getElementById('matcher-meter-fill');
+                var livePanel = document.querySelector('.matcher-live-panel');
+                var tipEl = document.getElementById('matcher-tip-strip');
                 if (countEl) countEl.textContent = count + (count === 1 ? ' choice made' : ' choices made');
                 if (fillEl) fillEl.style.width = quality + '%';
+                document.querySelectorAll('.quiz-dot').forEach(function (dot) {
+                    var step = dot.dataset.step;
+                    var complete = (step === 'interests' && selections.interests.length > 0) ||
+                        (step === 'skills' && selections.skills.length > 0) ||
+                        (step === 'goal' && !!selections.goal) ||
+                        (step === 'parents' && selections.parents.length > 0);
+                    dot.classList.toggle('complete', complete);
+                    dot.classList.toggle('active', !complete && (
+                        (step === 'interests' && !selections.interests.length) ||
+                        (step === 'skills' && selections.interests.length > 0 && !selections.skills.length) ||
+                        (step === 'goal' && selections.skills.length > 0 && !selections.goal) ||
+                        (step === 'parents' && selections.goal && !selections.parents.length)
+                    ));
+                });
+                if (livePanel) livePanel.classList.toggle('is-ready', quality >= 70);
                 if (readyEl) {
                     if (!selections.interests.length && !selections.skills.length) readyEl.textContent = 'Start with an interest or strength';
                     else if (!selections.goal) readyEl.textContent = 'Add a goal for sharper results';
                     else if (selections.interests.length + selections.skills.length < 3) readyEl.textContent = 'Add one or two more choices';
                     else readyEl.textContent = 'Ready for a strong match';
+                }
+                if (tipEl) {
+                    var nextTip = 'Start with what feels exciting. You can change every choice before matching.';
+                    if (selections.interests.length >= 5) nextTip = 'That is a wide curiosity profile. Add strengths so the matcher can separate nearby paths.';
+                    else if (selections.interests.length && !selections.skills.length) nextTip = 'Good start. Now pick up to 3 strengths you would enjoy using often.';
+                    else if (selections.skills.length && !selections.goal) nextTip = 'Add one primary goal to tune the recommendations toward your real priority.';
+                    else if (selections.goal && !selections.parents.length) nextTip = 'Family expectations are optional, but they help show practical entry routes.';
+                    else if (quality >= 70) nextTip = 'Strong profile. You are ready to match, and the result cards will show why each path fits.';
+                    if (tipEl.textContent !== nextTip) {
+                        tipEl.textContent = nextTip;
+                        tipEl.classList.remove('bump');
+                        void tipEl.offsetWidth;
+                        tipEl.classList.add('bump');
+                    }
                 }
             }
 
@@ -10040,10 +10947,30 @@
                     paths.innerHTML = '';
                     result.classList.add('show');
                     setTimeout(function () { result.classList.add('vis'); }, 10);
+                    
+                    var loadingText = document.getElementById('mr-loading-text');
+                    var loadingSubtext = document.getElementById('mr-loading-subtext');
+                    if (loadingText && loadingSubtext) {
+                        loadingText.textContent = "Analyzing your profile...";
+                        loadingSubtext.textContent = "Mapping selections to STEM domains";
+                        setTimeout(function () {
+                            loadingText.textContent = "Checking criteria compatibility...";
+                            loadingSubtext.textContent = "Evaluating strengths and goals";
+                        }, 550);
+                        setTimeout(function () {
+                            loadingText.textContent = "Filtering entrance pathways...";
+                            loadingSubtext.textContent = "Applying soft constraints for JEE/NEET/Govt";
+                        }, 1150);
+                    }
+
                     try {
-                        await new Promise(function (resolve) { setTimeout(resolve, 650); });
+                        await new Promise(function (resolve) { setTimeout(resolve, 1750); });
                         var matches = calculateMatches({ interests: interests, skills: skills, goal: goal, parents: parents, extra: extra });
                         renderResults(matches, paths, { interests: interests, skills: skills, goal: goal, parents: parents, extra: extra });
+                        
+                        // Start ticking counters for match scores with animation
+                        animateResultScores(paths);
+
                         loading.hidden = true;
                         content.hidden = false;
                         content.classList.add('show');
@@ -10171,15 +11098,15 @@
                 return matcherLabels[tag] || tag;
             }
 
-                function nextStepForCareer(match) {
-                    var entry = match.entry || '';
-                    if (entry.indexOf('/') !== -1) return 'Compare the entry routes first: ' + entry.split('/').slice(0, 2).join(' or ') + '.';
-                    return 'Start by checking the entry route: ' + entry + '.';
-                }
+            function nextStepForCareer(match) {
+                var entry = match.entry || '';
+                if (entry.indexOf('/') !== -1) return 'Compare the entry routes first: ' + entry.split('/').slice(0, 2).join(' or ') + '.';
+                return 'Start by checking the entry route: ' + entry + '.';
+            }
 
-                function normalizeCareerName(name) {
-                    return String(name || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim();
-                }
+            function normalizeCareerName(name) {
+                return String(name || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, ' ').trim();
+            }
 
             function calculateMatches(params) {
                 var interests = params.interests;
@@ -10245,70 +11172,127 @@
                     { id: 'paleo', name: 'Paleontology & Earth History', inst: 'BSIP Lucknow · Wadia Institute · IIT-B', entry: 'CSIR-NET / GATE / JAM', salary: '₹5–20L/yr', tags: ['nature', 'biology', 'research', 'detail', 'patience', 'observation'], parents: ['any', 'abroad'], why: function () { return 'BSIP Lucknow is India\'s premier paleo institute. India has rich fossil beds.'; } },
                     { id: 'polar_sci', name: 'Polar Science & Cryosphere', inst: 'NCPOR Goa · ESSO · IITM · NCAOR', entry: 'CSIR-NET / UGC-NET / NCPOR Exam', salary: '₹6–25L/yr', tags: ['climate', 'nature', 'research', 'travel', 'observation', 'patience'], parents: ['govtjob', 'abroad', 'any'], why: function () { return 'India has 3 Antarctic stations. NCPOR Goa is the gateway. Competitive but extraordinary.'; } }
                 ];
-                    var scored = careers.map(function (career) {
-                        var score = 0;
-                        var matchedTags = [];
-                        var matchedSkills = [];
-                        var matchedGoal = false;
-                        var directFit = 0;
-                        interests.forEach(function (j) {
-                            if (career.tags.indexOf(j) !== -1) {
-                                score += 4;
-                                directFit += 1;
-                                matchedTags.push(j);
-                                if (career.tags.indexOf(j) <= 2) score += 1;
-                            } else if (normalizeCareerName(career.name).indexOf(j) !== -1) {
-                                score += 2;
-                                directFit += 1;
-                                matchedTags.push(j);
-                            }
-                        });
-                        if (matchedTags.length >= 3) score += 2;
-                        if (matchedTags.length >= 2) score += 1;
-                        skills.forEach(function (s) {
-                            if (career.tags.indexOf(s) !== -1) {
-                                score += 2;
-                                directFit += 0.75;
-                                matchedSkills.push(s);
-                            }
-                        });
-                        if (goal && career.tags.indexOf(goal) !== -1) {
-                            score += 5;
-                            directFit += 1;
-                            matchedGoal = true;
+                var scored = careers.map(function (career) {
+                    var matchedTags = [];
+                    var matchedSkills = [];
+                    var matchedGoal = false;
+                    var directFit = 0;
+
+                    // 1. Calculate Interest Score (40% weight)
+                    var matchedInts = interests.filter(function (i) {
+                        return career.tags.indexOf(i) !== -1 || normalizeCareerName(career.name).indexOf(i) !== -1;
+                    });
+                    matchedInts.forEach(function (i) {
+                        matchedTags.push(i);
+                        directFit += 1;
+                    });
+                    var sInt = interests.length > 0 ? Math.min(1.0, matchedInts.length / Math.min(3, interests.length)) : 0.0;
+
+                    // 2. Calculate Strength/Skill Score (30% weight)
+                    var matchedStrs = skills.filter(function (s) {
+                        return career.tags.indexOf(s) !== -1;
+                    });
+                    matchedStrs.forEach(function (s) {
+                        matchedSkills.push(s);
+                        directFit += 0.75;
+                    });
+                    var sStr = skills.length > 0 ? Math.min(1.0, matchedStrs.length / Math.min(2, skills.length)) : 0.0;
+
+                    // 3. Calculate Goal Score (20% weight)
+                    var sGoal = 1.0;
+                    if (goal) {
+                        var goalMatches = false;
+                        if (career.tags.indexOf(goal) !== -1) {
+                            goalMatches = true;
+                        } else if (goal === 'creative' && (career.tags.indexOf('creative') !== -1 || career.tags.indexOf('writing') !== -1)) {
+                            goalMatches = true;
+                        } else if (goal === 'travel' && career.tags.indexOf('travel') !== -1) {
+                            goalMatches = true;
+                        } else if ((goal === 'research' || goal === 'discovery') && career.tags.indexOf('research') !== -1) {
+                            goalMatches = true;
+                        } else if (goal === 'leadership' && career.tags.indexOf('leadership') !== -1) {
+                            goalMatches = true;
+                        } else if (goal === 'entrepreneur' && career.tags.indexOf('entrepreneur') !== -1) {
+                            goalMatches = true;
+                        } else if (goal === 'flexibility' && (career.tags.indexOf('creative') !== -1 || career.tags.indexOf('travel') !== -1 || career.tags.indexOf('entrepreneur') !== -1)) {
+                            goalMatches = true;
                         }
-                    if (goal === 'creative' && (career.tags.indexOf('creative') !== -1 || career.tags.indexOf('writing') !== -1)) score += 2;
-                    if (goal === 'travel' && career.tags.indexOf('travel') !== -1) score += 2;
-                    if (goal === 'discovery' && career.tags.indexOf('research') !== -1) score += 3;
-                    if (goal === 'leadership' && career.tags.indexOf('leadership') !== -1) score += 3;
-                    if (goal === 'entrepreneur' && career.tags.indexOf('entrepreneur') !== -1) score += 3;
-                    if (goal === 'flexibility' && (career.tags.indexOf('creative') !== -1 || career.tags.indexOf('travel') !== -1)) score += 2;
-                    if (parents && parents.length > 0) {
-                        if (parents.indexOf('any') !== -1) score += 1;
-                        var parentMatches = (career.parents || []).filter(function (p) { return parents.indexOf(p) !== -1; });
-                        score += parentMatches.length * 2.5;
-                        if (parentMatches.length >= 2) score += 1;
-                        if (parents.indexOf('iitjee') !== -1 && career.parents.indexOf('iitjee') === -1 && parents.indexOf('any') === -1) score -= 1;
-                        if (parents.indexOf('neet') !== -1 && career.parents.indexOf('neet') === -1 && career.parents.indexOf('medicine') === -1 && parents.indexOf('any') === -1) score -= 1;
+                        
+                        if (goalMatches) {
+                            matchedGoal = true;
+                            directFit += 1;
+                            sGoal = 1.0;
+                        } else {
+                            sGoal = 0.25;
+                        }
                     }
+
+                    // 4. Calculate Constraints/Parents Score (10% weight)
+                    var sParents = 1.0;
+                    var actualParentsList = parents.filter(function (p) { return p !== 'any' && p !== 'flexible'; });
+                    if (actualParentsList.length > 0) {
+                        var satisfied = 0;
+                        actualParentsList.forEach(function (p) {
+                            if (p === 'iitjee' && (career.parents.indexOf('iitjee') !== -1 || career.entry.toLowerCase().indexOf('jee') !== -1 || career.entry.toLowerCase().indexOf('iist') !== -1)) {
+                                satisfied++;
+                            } else if (p === 'neet' && (career.parents.indexOf('neet') !== -1 || career.tags.indexOf('medicine') !== -1 || career.entry.toLowerCase().indexOf('neet') !== -1)) {
+                                satisfied++;
+                            } else if (p === 'govtjob' && (career.parents.indexOf('govtjob') !== -1 || career.entry.toLowerCase().indexOf('upsc') !== -1 || career.entry.toLowerCase().indexOf('psc') !== -1 || career.entry.toLowerCase().indexOf('barc') !== -1 || career.entry.toLowerCase().indexOf('isro') !== -1 || career.entry.toLowerCase().indexOf('drdo') !== -1)) {
+                                satisfied++;
+                            } else if (p === 'familybiz' && career.parents.indexOf('familybiz') !== -1) {
+                                satisfied++;
+                            } else if (p === 'abroad' && (career.parents.indexOf('abroad') !== -1 || career.tags.indexOf('research') !== -1)) {
+                                satisfied++;
+                            }
+                        });
+                        sParents = satisfied / actualParentsList.length;
+                    }
+
+                    // 5. Dynamic Weighting based on user selections
+                    var totalWeight = 0;
+                    var weightedSum = 0;
+                    
+                    if (interests.length > 0) {
+                        totalWeight += 40;
+                        weightedSum += sInt * 40;
+                    }
+                    if (skills.length > 0) {
+                        totalWeight += 30;
+                        weightedSum += sStr * 30;
+                    }
+                    if (goal) {
+                        totalWeight += 20;
+                        weightedSum += sGoal * 20;
+                    }
+                    if (actualParentsList.length > 0) {
+                        totalWeight += 10;
+                        weightedSum += sParents * 10;
+                    }
+
+                    var basePercent = totalWeight > 0 ? (weightedSum / totalWeight) * 100 : 0;
+
+                    // 6. Custom Notes Keyword scanning boost
+                    var extraBoost = 0;
                     if (extra) {
                         var textHaystack = (career.name + ' ' + career.inst + ' ' + career.entry + ' ' + career.tags.join(' ')).toLowerCase();
-                        extra.split(/\s+/).forEach(function (word) {
-                            if (word.length > 3 && textHaystack.indexOf(word) !== -1) score += 0.8;
+                        var words = extra.split(/\s+/);
+                        var matchedWords = 0;
+                        words.forEach(function (word) {
+                            if (word.length > 3 && textHaystack.indexOf(word) !== -1) {
+                                matchedWords++;
+                            }
                         });
+                        if (matchedWords > 0) {
+                            extraBoost = Math.min(15, matchedWords * 5);
+                        }
                     }
-                    var interestBase = interests.length * 3;
-                    var skillBase = skills.length * 2;
-                    var goalBase = goal ? 8 : 0;
-                    var parentBase = parents.length > 0 ? 6 : 0;
-                    var synergyBase = interests.length >= 3 ? 3 : (interests.length >= 2 ? 1 : 0);
-                    var extraBase = extra ? 4 : 0;
-                    var maxPossible = interestBase + skillBase + goalBase + parentBase + synergyBase + extraBase;
-                    var normalizedScore = maxPossible > 0 ? (score / maxPossible) * 100 : 0;
+                    
+                    var finalPercent = Math.min(100, Math.max(0, Math.round(basePercent + extraBoost)));
+
                     var newCareer = {};
                     for (var key in career) { newCareer[key] = career[key]; }
-                    newCareer.score = score;
-                    newCareer.matchPercent = Math.min(Math.round(normalizedScore), 99);
+                    newCareer.score = finalPercent;
+                    newCareer.matchPercent = finalPercent;
                     newCareer.matchedTags = matchedTags;
                     newCareer.matchedSkills = matchedSkills;
                     newCareer.matchedGoal = matchedGoal;
@@ -10331,35 +11315,110 @@
                         var nc = {};
                         for (var key in c) { nc[key] = c[key]; }
                         nc.score = 1;
-                        nc.matchPercent = 0;
+                        nc.matchPercent = 35;
                         return nc;
                     });
                 }
                 return ranked
                     .sort(function (a, b) {
-                        if (b.directFit !== a.directFit) return b.directFit - a.directFit;
                         if (b.matchPercent !== a.matchPercent) return b.matchPercent - a.matchPercent;
+                        if (b.directFit !== a.directFit) return b.directFit - a.directFit;
                         return b.score - a.score;
                     })
                     .slice(0, 4);
             }
 
-            function renderResults(matches, container) {
+            function uniqueMatcherTags(tags) {
+                var seen = {};
+                return (tags || []).filter(function (tag) {
+                    if (!tag || seen[tag]) return false;
+                    seen[tag] = true;
+                    return true;
+                });
+            }
+
+            function animateResultScores(container) {
+                container.querySelectorAll('.mr-path').forEach(function (card, idx) {
+                    var scoreEl = card.querySelector('.mr-match-score');
+                    if (!scoreEl) return;
+                    var targetVal = parseInt(scoreEl.getAttribute('data-target')) || 0;
+                    scoreEl.textContent = '0% match';
+                    
+                    var delay = idx * 90 + 200; 
+                    setTimeout(function () {
+                        var startTime = performance.now();
+                        var duration = 650;
+                        
+                        function update(now) {
+                            var elapsed = now - startTime;
+                            var progress = Math.min(elapsed / duration, 1);
+                            var ease = progress * (2 - progress);
+                            var current = Math.round(ease * targetVal);
+                            scoreEl.textContent = current + '% match';
+                            if (progress < 1) {
+                                requestAnimationFrame(update);
+                            } else {
+                                scoreEl.textContent = targetVal + '% match';
+                            }
+                        }
+                        requestAnimationFrame(update);
+                    }, delay);
+                });
+            }
+
+            function renderResults(matches, container, context) {
                 if (!matches || matches.length === 0) {
                     container.innerHTML = '<p style="color:var(--ink-3)">No exact matches found. Try selecting different interests or strengths.</p>';
                     return;
                 }
+                context = context || {};
                 container.innerHTML = matches.map(function (match, idx) {
                     var whyText = typeof match.why === 'function' ? match.why() : match.why;
                     var matchPercent = match.matchPercent || 0;
                     var rank = idx + 1;
+                    
+                    var matchedInts = (match.matchedTags || []).filter(function(t) {
+                        return (context.interests || []).indexOf(t) !== -1;
+                    }).map(labelForMatcherTag);
+                    
+                    var matchedSkills = (match.matchedSkills || []).filter(function(t) {
+                        return (context.skills || []).indexOf(t) !== -1;
+                    }).map(labelForMatcherTag);
+                    
+                    var dynamicWhy = "";
+                    if (matchedInts.length > 0 && matchedSkills.length > 0) {
+                        dynamicWhy = "✨ Fits your interests in " + matchedInts.slice(0, 3).join(", ") + " & leverages your strength in " + matchedSkills.slice(0, 2).join(", ");
+                    } else if (matchedInts.length > 0) {
+                        dynamicWhy = "✨ Matches your interests in " + matchedInts.slice(0, 3).join(", ");
+                    } else if (matchedSkills.length > 0) {
+                        dynamicWhy = "✨ Leverages your strength in " + matchedSkills.slice(0, 3).join(", ");
+                    }
+                    
+                    if (match.matchedGoal && context.goal) {
+                        dynamicWhy += (dynamicWhy ? ", aligning with your goal of " : "✨ Aligns with your goal of ") + labelForMatcherTag(context.goal).toLowerCase();
+                    }
+                    
+                    var dynamicWhyHtml = "";
+                    if (dynamicWhy) {
+                        dynamicWhyHtml = '<div class="mrp-dynamic-why" style="font-size:0.8rem; font-weight:600; color:var(--accent); margin-bottom:0.6rem; padding: 0.35rem 0.65rem; background:rgba(200, 52, 42, 0.04); border-radius:var(--radius-sm); border-left:2.5px solid var(--accent);">' + escapeHtml(dynamicWhy) + '</div>';
+                    }
+                    
+                    var evidence = uniqueMatcherTags([].concat(match.matchedTags || [], match.matchedSkills || [], match.matchedGoal ? [context.goal] : [], match.parentMatches || [])).slice(0, 6);
+                    var evidenceHtml = evidence.length ? '<div class="mrp-evidence">' + evidence.map(function (tag) {
+                        return '<span class="mrp-pill">' + escapeHtml(labelForMatcherTag(tag)) + '</span>';
+                    }).join('') + '</div>' : '';
+                    var nextStep = match.nextStep || nextStepForCareer(match);
                     return '<div class="mr-path match-' + rank + '" tabindex="0">' +
                         '<div class="mrp-name">' + escapeHtml(match.name) +
-                        '<span class="mr-match-score">' + matchPercent + '% match</span>' +
+                        '<span class="mr-match-score" data-target="' + matchPercent + '">0% match</span>' +
                         '</div>' +
+                        '<div class="mrp-fit"><div class="mrp-fit-track" aria-hidden="true"><span class="mrp-fit-bar" style="width:' + matchPercent + '%"></span></div></div>' +
+                        dynamicWhyHtml +
                         '<div class="mrp-why">' + escapeHtml(whyText) + '</div>' +
+                        evidenceHtml +
                         '<div class="mrp-entry">' + escapeHtml(match.inst) + ' · ' + escapeHtml(match.entry) + '</div>' +
                         '<div class="mrp-salary" style="font-family:var(--hand-2);color:var(--accent);font-size:0.9rem;margin-top:0.4rem">Salary: <strong>' + escapeHtml(match.salary) + '</strong></div>' +
+                        '<div class="mrp-next">' + escapeHtml(nextStep) + '</div>' +
                         '</div>';
                 }).join('');
             }
@@ -10533,7 +11592,7 @@
                    - smooth ~320ms transition wrapped around the toggle only (no perf
                      impact on regular page interactions)
                    - respects prefers-color-scheme on first visit, listens for changes
-                   - updates the visible toggle icon
+                   - updates the visible toggle icon + meta theme-color + color-scheme on toggle
                 */
                 var themeToggle = document.getElementById('theme-toggle');
                 var themeIcon = document.getElementById('theme-icon');
@@ -10703,7 +11762,7 @@
                     }
                 }
 
-                /* ---------- Reset filters button ---------- */
+                /* ---------- Reset filters button lol ---------- */
                 var resetBtn = document.getElementById('filter-reset');
                 if (resetBtn) {
                     resetBtn.addEventListener('click', function () {
@@ -10719,7 +11778,7 @@
                     });
                 }
 
-                // Hook into the existing f-btn click handler so our filter applies too
+                // Hook into the existing f-btn click handler so our filter applies too too.
                 document.querySelectorAll('.f-btn').forEach(function (btn) {
                     btn.addEventListener('click', function () {
                         setTimeout(applyFilters, 30);
@@ -10846,7 +11905,7 @@
                         '<div class="modal-meta-item"><span class="label-sm">Tag</span><span class="value-sm">' + tag + '</span></div>' +
                         '<div class="modal-meta-item"><span class="label-sm">Pathway ID</span><span class="value-sm" style="font-family:var(--mono);font-size:0.82rem">' + card.dataset.id + '</span></div>';
 
-                    // Update compare button state
+                    // Update compare button state for this card
                     var cmpBtn = document.getElementById('modal-compare');
                     if (cmpBtn) {
                         var inCompare = compareList.indexOf(card.dataset.id) !== -1;
@@ -11062,7 +12121,7 @@
                     setTimeout(function () { w.print(); }, 300);
                 }
 
-                /* ---------- Compare tray show ---------- */
+                /* ---------- Compare tray show newer version ---------- */
                 var compareList = [];
                 var COMPARE_MAX = 3;
                 var compareTray = document.getElementById('compare-tray');
@@ -11085,7 +12144,7 @@
                         arivuToast('Removed from compare', 'info', 1400);
                     }
                     updateCompareUI();
-                    // Update modal compare button if open
+                    // Update modal compare button if open and card is in compare list.
                     if (currentModalCard && currentModalCard.dataset.id === id) {
                         var inCompare = compareList.indexOf(id) !== -1;
                         var cmpBtn = document.getElementById('modal-compare');
@@ -11138,7 +12197,7 @@
                 }
 
                 function updateFavUI() {
-                    // Favorite controls are optional; keep enhanced interactions from failing when absent.
+                    // Favorite controls are optional; keep enhanced interactions from failing when absent important.
                 }
 
                 if (ctaCompare) ctaCompare.addEventListener('click', openCompareModal);
@@ -11184,7 +12243,7 @@
                     });
                     html += '</tbody></table></div>';
 
-                    // Reuse the modal backdrop with dedicated comparison content.
+                    // Reuse the modal backdrop with dedicated comparison content newer version.
                     document.getElementById('modal-cat').textContent = 'Side-by-side comparison';
                     document.getElementById('modal-name').textContent = 'Comparing ' + cards.length + ' pathways';
                     document.getElementById('modal-inst').textContent = 'Compare key attributes at a glance';
@@ -11213,7 +12272,7 @@
                     else closeModal();
                 });
 
-                /* ---------- Keyboard navigation across pathway ls ls  cards ---------- */
+                /* ---------- Keyboard navigation across pathway ls ls lol cards ---------- */
                 function focusCard(dir) {
                     var visible = allCards.filter(function (c) { return !c.classList.contains('hidden'); });
                     if (!visible.length) return;
@@ -11236,7 +12295,7 @@
                 updateFavUI();
                 updateCompareUI();
                 applyFilters();
-                // Show a welcome toast on first visit
+                // Show a welcome toast on first visit lol
                 try {
                     if (!sessionStorage.getItem('arivu-welcomed')) {
                         setTimeout(function () {
@@ -11260,5 +12319,6 @@
 
     </script>
 </body>
-//lol
+
+
 </html>
